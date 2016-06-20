@@ -1,0 +1,69 @@
+// Copyright (c) 2016, Pavlo Aksonov
+// All rights reserved.
+import {State, StateMachine, Transition} from 'statem';
+import {action, computed, observable} from 'mobx';
+
+{{#states }}
+    export class {{ id }}State extends State {
+    {{#parentProps}}
+        @computed get {{ id }}() { return this.parent.{{id}} };
+    {{/parentProps}}
+    {{#vars}}
+        @computed get {{ id }}() { return {{ value }} };
+    {{/vars}}
+    {{#props }}
+        @observable {{ id }};
+    {{/props}}
+
+    constructor(_, parent, sm){
+    super({ {{# initial}}initial: "{{ initial }}", {{/ initial}}id: "{{id}}"}, parent, sm);
+    {{# parentProps }}
+        const {{ id }} = this.{{ id }};
+    {{/parentProps}}
+    {{# vars}}
+        const {{ id }} = this.{{ id }};
+    {{/vars}}
+    {{#props}}
+        const {{ id }} = {{ value }};
+        this.{{ id }} = {{id}};
+    {{/props}}
+
+    let states = [];
+    {{#state}}
+        states.push(new {{id}}State(null, this, sm));
+    {{/state}}
+    let transition = [];
+    {{#transition }}
+        transition.push({
+        {{# event}} event: "{{event}}", {{/event}}
+        {{# cond}} cond: {{& cond}}, {{/cond}}
+        {{# target}} target:"{{ target }}", {{/target}}
+        {{# ontransition}}onentry:{{& ontransition}}, {{/ ontransition}}
+        });
+    {{/transition}}
+
+    this.states = states;
+    this.transitions = transition.map(el => new Transition(this, el));
+    {{# onentry}}this.onEntry = {{& onentry}}; {{/ onentry}}
+    {{# onexit}}this.onExit = {{& onexit}}; {{/ onexit}}
+
+    sm.addState(this);
+
+    }
+    {{#methods}}
+        {{ name }} = (data) => {
+        this.sm.handle("{{ name }}", data);
+        };
+    {{/methods}}
+    }
+{{/states}}
+
+class CustomStateMachine extends StateMachine {
+{{#states}}
+    {{ lid }}: {{id}}State = this.getState("{{id}}");
+{{/states}}
+}
+
+export default function createStateMachine(props) {
+return new CustomStateMachine(null, RootState, props);
+}

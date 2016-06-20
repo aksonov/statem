@@ -1,0 +1,62 @@
+<scxml initial="Load_Data" name="success" version="1.0" xmlns="http://www.w3.org/2005/07/scxml"><!--   node-size-and-position x=0 y=0 w=740 h=1015  -->
+ <datamodel>
+  <data id="user" expr="{a:1, b:2}"/>
+  <data id="storage" expr="this.sm.storage"/>
+  <data id="xmpp" expr="this.sm.xmpp"/>
+ </datamodel>
+ <state id="Load_Data"><!--   node-size-and-position x=270 y=40 w=75 h=75  -->
+  <onentry>
+   <promise>storage.load()</promise>
+   <log label="Load Data" expr="1"/>
+  </onentry>
+  <transition event="success" cond="_event.data.a" target="Connect"></transition>
+  <transition event="success" cond="!_event.data.a" target="PromoScene"></transition>
+  <transition event="failure" target="PromoScene"></transition>
+ </state>
+ <state id="Connect"><!--   node-size-and-position x=120 y=170 w=80 h=50  -->
+  <onentry>
+   <log label="Connect" expr="_event.data"/>
+   <promise>xmpp.login(_event.data.a)</promise>
+  </onentry>
+  <transition event="failure" target="PromoScene"></transition>
+  <transition event="success" target="Load_Profile"></transition>
+ </state>
+ <state id="PromoScene"><!--   node-size-and-position x=450 y=170 w=80 h=50  -->
+  <onentry>
+   <assign location="user.c" expr="_event.data"/>
+   <script>user.c = _event.data;console.log("!!!!!!!", user)</script>
+   <log label="PromoScene" expr="user"/>
+  </onentry>
+  <transition event="success" target="Register"></transition>
+ </state>
+ <state id="Register"><!--   node-size-and-position x=270 y=250 w=80 h=50  -->
+  <onentry>
+   <promise>xmpp.register(_event.data.username, _event.data.password)</promise>
+  </onentry>
+  <transition event="success" target="Connect"></transition>
+ </state>
+ <state id="Load_Profile"><!--   node-size-and-position x=260 y=370 w=80 h=50  -->
+  <onentry>
+   <script>run(r.xmpp.request, _event.data.user)</script>
+  </onentry>
+  <transition event="failure" target="PromoScene"></transition>
+  <transition cond="!response.handle" event="success" target="SignUpScene"></transition>
+  <transition cond="response.handle" event="success" target="LoggedScene"></transition>
+ </state>
+ <state id="SignUpScene"><!--   node-size-and-position x=450 y=280 w=80 h=40  -->
+  <onentry>
+  </onentry>
+  <transition event="success" target="Register_Profile"><!--   edge-path [Register_Profile]  pointx=0 pointy=15 offsetx=7 offsety=1  --></transition>
+ </state>
+ <state id="Register_Profile"><!--   node-size-and-position x=440 y=370 w=100 h=50  -->
+  <onentry>
+   <script>run(xmpp.update, _event.data)</script>
+  </onentry>
+  <transition event="failure" target="SignUpScene"><!--   edge-path [SignUpScene]  x=460 y=360 pointx=0 pointy=4 offsetx=-10 offsety=5  --></transition>
+  <transition event="success" target="Load_Profile"></transition>
+ </state>
+ <state id="LoggedScene" initial="new_node71"><!--   node-size-and-position x=50 y=460 w=580 h=555  -->
+  <state id="new_node68"><!--   node-size-and-position x=30 y=50 w=75 h=75  --></state>
+  <state id="new_node71"><!--   node-size-and-position x=140 y=60 w=75 h=75  --></state>
+ </state>
+</scxml>
