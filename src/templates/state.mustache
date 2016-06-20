@@ -6,7 +6,8 @@ import {action, computed, observable} from 'mobx';
 {{#states }}
     export class {{ id }}State extends State {
     {{#parentProps}}
-        @computed get {{ id }}() { return this.parent.{{id}} };
+        get {{ id }}() { return this.parent.{{id}} };
+        set {{ id }}(value) { this.parent.{{id}} = value };
     {{/parentProps}}
     {{#vars}}
         @computed get {{ id }}() { return {{ value }} };
@@ -16,7 +17,7 @@ import {action, computed, observable} from 'mobx';
     {{/props}}
 
     constructor(_, parent, sm){
-    super({ {{# initial}}initial: "{{ initial }}", {{/ initial}}id: "{{id}}"}, parent, sm);
+    super({ {{# initial}}initial: "{{ initial }}", {{/ initial}}{{# type}}$type: "{{ type }}", {{/ type}}id: "{{id}}"}, parent, sm);
     {{# parentProps }}
         const {{ id }} = this.{{ id }};
     {{/parentProps}}
@@ -58,12 +59,12 @@ import {action, computed, observable} from 'mobx';
     }
 {{/states}}
 
-class CustomStateMachine extends StateMachine {
+export class Statem extends StateMachine {
 {{#states}}
     {{ lid }}: {{id}}State = this.getState("{{id}}");
 {{/states}}
 }
 
 export default function createStateMachine(props) {
-return new CustomStateMachine(null, RootState, props);
+  return new Statem(null, __RootState, props);
 }

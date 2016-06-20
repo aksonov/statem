@@ -33,7 +33,6 @@ export default class StateMachine {
   };
 
   handle = (event, data) => {
-    console.log("GEN:", event, data);
     this.interpreter.gen(event, data);
   };
 
@@ -55,6 +54,6 @@ export default class StateMachine {
     this.handle("success", data);
   };
   failure = (data) => {
-    this.handle("failure", data);
+    this.interpreter.handle("failure", data);
   };
 }

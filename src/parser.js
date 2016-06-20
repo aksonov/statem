@@ -2,7 +2,7 @@
 // All rights reserved.
 
 var Mustache = require('mustache');
-
+var assert = require('assert');
 function toArray(m){
   var res = [];
   Object.keys(m).forEach(id=>{
@@ -12,6 +12,7 @@ function toArray(m){
 }
 
 function asArray(a){
+  if (!a) return [];
   if (Array.isArray(a)){
     return a;
   } else {
@@ -123,14 +124,14 @@ const res =   new DOMParser().parseFromString(data,"text/xml").documentElement;
 //console.log(JSON.stringify(parseXml(res)))
 const root = parseXml(res);
 //console.log(JSON.stringify(root));
-root.id = 'Root';
+root.id = '__Root';
 
 var states = [];
 var template = fs.readFileSync(templatePath,'utf-8');
 if (process.argv.length > 4 && process.argv[4] === 'test'){
   template = template.replace(/'statem'/g, "'../index'");
 }
-  function wrapWithFunction(params){
+function wrapWithFunction(params, ret){
   var args = params;
   if (!Array.isArray(args)){
     args = [args];
@@ -139,7 +140,7 @@ if (process.argv.length > 4 && process.argv[4] === 'test'){
   for (var i=0;i<args.length-1;i++){
     res+=args[i]+';'
   }
-  res+=`return ${args[args.length-1]};`;
+  res+=`${ret ? 'return' : ''} ${args[args.length-1]};`;
   return `_event => {${wrapTry(res)} }`;
 }
 function wrapTry(res){
@@ -148,9 +149,14 @@ function wrapTry(res){
 }
 function generate(root, states, parent, parentProps){
   var id = root.id;
+  assert(id, "id is not defined for element:" + JSON.stringify(root));
   var lid = id.charAt(0).toLowerCase() + id.slice(1);
   var onentry = [];
   if (root.onentry){
+    if (root.onentry.assign){
+      //console.log(root.onentry.promise);
+      onentry = onentry.concat(asArray(root.onentry.assign).map(el=>`this.${el.location} = ${el.expr}`));
+    }
     if (root.onentry.script){
       onentry = onentry.concat(asArray(root.onentry.script));
     }
@@ -164,7 +170,7 @@ function generate(root, states, parent, parentProps){
     }
   }
   if (onentry.length){
-    onentry = wrapWithFunction(onentry);
+    onentry = wrapWithFunction(onentry, false);
   } else {
     onentry = null;
   }
@@ -175,7 +181,7 @@ function generate(root, states, parent, parentProps){
     } else {
       onexit = root.onexit.script;
     }
-    onexit = wrapWithFunction(onexit);
+    onexit = wrapWithFunction(onexit, false);
   }
   var transition = root.transition;
   var methods = [];
@@ -216,10 +222,10 @@ function generate(root, states, parent, parentProps){
     }
     transition.forEach(t=> {
       if (t.onentry){
-        t.ontransition = wrapWithFunction(t.onentry);
+        t.ontransition = wrapWithFunction(t.onentry, false);
       }
       if (t.cond){
-        t.cond = wrapWithFunction(t.cond);
+        t.cond = wrapWithFunction(t.cond, true);
       }
       t.name = t.event || 'default';
       if (!exists[t.name] && t.name !== "success" && t.name !== "failure"){
@@ -228,12 +234,19 @@ function generate(root, states, parent, parentProps){
       }
     });
   }
-  states.push( {parent, vars:toArray(vars), props:toArray(props), parentProps:toArray(parentProps), id, lid, initial:root.initial, state:root.state, transition:root.transition, onentry, onexit, methods});
-  if (root.state){
-    root.state.forEach(s => {
-      generate(s, states, id, allProps);
-    })
+  var type = root.type;
+  var children = asArray(root.state);
+  // parallel state
+  if (root.parallel){
+    var el = {};
+    Object.assign(el, root.parallel);
+    el.type = 'parallel';
+    children.push(el);
   }
+  states.push( {parent, vars:toArray(vars), props:toArray(props), parentProps:toArray(parentProps), type, id, lid, initial:root.initial, state:children, transition:root.transition, onentry, onexit, methods});
+  children.forEach(s => {
+    generate(s, states, id, allProps);
+  })
 }
 
 generate(root, states, '', {});

@@ -13,13 +13,15 @@ export default class State {
   transitions;
   sm;
   parent;
+  $type;
   handlers = {};
   
   constructor(data, parent, sm){
     assert(data, "No state data is defined!");
-    let {id, transition, state, states, onentry, onexit, initial} = data;
+    let {id, $type, transition, state, states, onentry, onexit, initial} = data;
     assert(id, "State should contain id");
     this.id = id;
+    this.$type = $type;
     this.parent = parent;
     this.sm = sm;
     this.initial = initial;
@@ -51,10 +53,10 @@ export default class State {
   }
   
   promise = (res)=> {
-    console.log("RESULT:", res);
+    //console.log("RESULT:", res);
     if (res && res.then){
       res.then(response=>{
-        console.log("SUCCESS:", response);
+        //console.log("SUCCESS:", response);
         this.success(response);
       }).catch(e => {
         console.error(e);
