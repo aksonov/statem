@@ -18,12 +18,13 @@ export default class StateMachine {
     const StateClass = stateClass || State;
     const data = new StateClass(state, null, this);
     this.interpreter = new scion.Statechart(data);
-    
+    this.interpreter._evaluateAction = function(currentEvent, actionRef) {
+        return actionRef.call(this._scriptingContext, currentEvent);     //SCXML system variables
+    };
+
     this.interpreter.registerListener({
       onEntry: (state)=>{this.state = state;console.log(`Entering state ${state}`)},
       onTransition: (from, to)=>console.log(`Transition from ${from} to ${to}`),
-      onError: ({tagname, reason, line, column}) =>
-      {throw new Error(`Error: ${tagname} Reason: ${reason}, line:${line}, column:${column}`)},
       onExit: (state)=>console.log(`Exit state ${state}`)});
   }
 
@@ -32,6 +33,7 @@ export default class StateMachine {
   };
 
   handle = (event, data) => {
+    console.log("GEN:", event, data);
     this.interpreter.gen(event, data);
   };
 
@@ -50,9 +52,9 @@ export default class StateMachine {
   }
 
   success = (data) => {
-    this.interpreter.handle("success", data);
+    this.handle("success", data);
   };
   failure = (data) => {
-    this.interpreter.handle("failure", data);
+    this.handle("failure", data);
   };
 }

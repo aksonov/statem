@@ -1,6 +1,6 @@
 {
   "name": "statem",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Harel Statecharts state machine with code generation from SCXML statecharts",
   "main": "index.js",
   "scripts": {

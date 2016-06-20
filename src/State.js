@@ -13,6 +13,7 @@ export default class State {
   transitions;
   sm;
   parent;
+  handlers = {};
   
   constructor(data, parent, sm){
     assert(data, "No state data is defined!");
@@ -56,14 +57,20 @@ export default class State {
         console.log("SUCCESS:", response);
         this.success(response);
       }).catch(e => {
-        console.log("FAILURE:", e);
+        console.error(e);
         this.failure(e)
       });
     } else {
         setTimeout(()=>res ? this.success(res) : this.failure(res));
     }
   };
-  
+
+  on(stream, event) {
+    if (!this.handlers[event]){
+      this.handlers[event] = stream.onValue(e => this.sm.handle(event, e));
+    }
+  }
+
   success = (data) => {
     this.sm.handle("success", data);
   };

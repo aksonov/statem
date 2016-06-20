@@ -143,7 +143,8 @@ if (process.argv.length > 4 && process.argv[4] === 'test'){
   return `_event => {${wrapTry(res)} }`;
 }
 function wrapTry(res){
-  return `try {${res}} catch (e){ console.error(e.stack)}`;
+  return res;
+  //return `try {${res}} catch (e){ console.error(e.stack)}`;
 }
 function generate(root, states, parent, parentProps){
   var id = root.id;
@@ -157,7 +158,11 @@ function generate(root, states, parent, parentProps){
       //console.log(root.onentry.promise);
       onentry = onentry.concat(asArray(root.onentry.promise).map(el=>`this.promise(${el})`));
     }
-  } 
+    if (root.onentry.on){
+      //console.log(root.onentry.promise);
+      onentry = onentry.concat(asArray(root.onentry.on).map(el=>`this.on(${el.stream}, "${el.target}")`));
+    }
+  }
   if (onentry.length){
     onentry = wrapWithFunction(onentry);
   } else {
@@ -190,10 +195,14 @@ function generate(root, states, parent, parentProps){
       if (parentProps[p.id]){
         delete parentProps[p.id];
       }
-      if (p.expr.indexOf('this.sm.') !== -1) {
+      if (p.expr && p.expr.indexOf('this.sm.') !== -1) {
         vars[p.id] = p.expr;
       } else {
-        props[p.id] = p.expr;
+        if (p.expr){
+          props[p.id] = p.expr;
+        } else {
+          props[p.id] = 'undefined';
+        }
       }
     });
   }

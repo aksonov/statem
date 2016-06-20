@@ -24,7 +24,7 @@ import {action, computed, observable} from 'mobx';
         const {{ id }} = this.{{ id }};
     {{/vars}}
     {{#props}}
-        const {{ id }} = {{ value }};
+        let {{ id }} = {{ value }};
         this.{{ id }} = {{id}};
     {{/props}}
 
