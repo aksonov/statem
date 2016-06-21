@@ -1,18 +1,26 @@
-<scxml initial="Load_Data" name="success" version="1.0" xmlns="http://www.w3.org/2005/07/scxml"><!--   node-size-and-position x=0 y=0 w=740 h=1015  -->
+<scxml name="success" version="1.0" xmlns="http://www.w3.org/2005/07/scxml"><!--   node-size-and-position x=0 y=0 w=740 h=1015  -->
  <datamodel>
   <data id="user" expr="{a:1, b:2}"/>
   <data id="storage" expr="this.sm.storage"/>
   <data id="xmpp" expr="this.sm.xmpp"/>
  </datamodel>
- <state id="Load_Data"><!--   node-size-and-position x=270 y=40 w=75 h=75  -->
+ <initial id="Init">
+  <transition target="History"/>
+ </initial>
+ <transition event="error" target="Error"/>
+ <history type="deep" id="History">
+  <transition target="Root"/>
+ </history>
+<state id="Root" >
+ <initial id="Load_Data"><!--   node-size-and-position x=270 y=40 w=75 h=75  -->
   <onentry>
    <promise>storage.load()</promise>
    <log label="Load Data" expr="1"/>
   </onentry>
-  <transition event="success" cond="_event.data.a" target="Connect"></transition>
-  <transition event="success" cond="!_event.data.a" target="PromoScene"></transition>
+  <transition event="success" cond="_event.data &amp;&amp;_event.data.a" target="Connect"></transition>
+  <transition event="success" cond="!_event.data || !_event.data.a" target="PromoScene"></transition>
   <transition event="failure" target="PromoScene"></transition>
- </state>
+ </initial>
  <state id="Connect"><!--   node-size-and-position x=120 y=170 w=80 h=50  -->
   <onentry>
    <log label="Connect" expr="_event.data"/>
@@ -59,4 +67,9 @@
   <state id="new_node68"><!--   node-size-and-position x=30 y=50 w=75 h=75  --></state>
   <state id="new_node71"><!--   node-size-and-position x=140 y=60 w=75 h=75  --></state>
  </state>
+</state>
+ <state id="Error">
+  <transition event="handled" target="History"/>
+ </state>
+
 </scxml>

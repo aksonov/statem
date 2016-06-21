@@ -17,7 +17,7 @@ import {action, computed, observable} from 'mobx';
     {{/props}}
 
     constructor(_, parent, sm){
-    super({ {{# initial}}initial: "{{ initial }}", {{/ initial}}{{# type}}$type: "{{ type }}", {{/ type}}id: "{{id}}"}, parent, sm);
+    super({ id: "{{id}}"}, parent, sm);
     {{# parentProps }}
         const {{ id }} = this.{{ id }};
     {{/parentProps}}
@@ -30,23 +30,22 @@ import {action, computed, observable} from 'mobx';
     {{/props}}
 
     let states = [];
-    {{#state}}
+    {{#states}}
         states.push(new {{id}}State(null, this, sm));
-    {{/state}}
+    {{/states}}
     let transition = [];
-    {{#transition }}
+    {{#transitions }}
         transition.push({
         {{# event}} event: "{{event}}", {{/event}}
         {{# cond}} cond: {{& cond}}, {{/cond}}
         {{# target}} target:"{{ target }}", {{/target}}
         {{# ontransition}}onentry:{{& ontransition}}, {{/ ontransition}}
         });
-    {{/transition}}
+    {{/transitions}}
 
     this.states = states;
     this.transitions = transition.map(el => new Transition(this, el));
-    {{# onentry}}this.onEntry = {{& onentry}}; {{/ onentry}}
-    {{# onexit}}this.onExit = {{& onexit}}; {{/ onexit}}
+    {{# params }}this.{{key}} = {{& value}}; {{/params}}
 
     sm.addState(this);
 

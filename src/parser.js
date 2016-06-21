@@ -3,6 +3,8 @@
 
 var Mustache = require('mustache');
 var assert = require('assert');
+var transform = require('scxml/lib/compiler/scxml-to-scjson');
+var inc=0;
 function toArray(m){
   var res = [];
   Object.keys(m).forEach(id=>{
@@ -11,102 +13,6 @@ function toArray(m){
   return res;
 }
 
-function asArray(a){
-  if (!a) return [];
-  if (Array.isArray(a)){
-    return a;
-  } else {
-    return [a];
-  }
-}
-function processData(result){
-  if (typeof result === "object"){
-    if (Array.isArray(result)){
-      return result.map(el=>processData(el));
-    } else {
-      if (result["#text"]){
-        return result["#text"];
-      }
-      var res = {};
-      var changed = false;
-      for (var key in result){
-        if (result.hasOwnProperty(key)){
-          changed = true;
-          res[key] = processData(result[key]);
-        }
-      }
-      if (!changed){
-        return undefined;
-      }
-      return res;
-    }
-  } else {
-    return result;
-  }
-
-}
-
-
-function parseXml(xml, arrayTags){
-  function isArray(o) {
-    return Object.prototype.toString.apply(o) === '[object Array]';
-  }
-
-  function parseNode(xmlNode, result) {
-    if (xmlNode.nodeName == "#text") {
-      /* if you want the object to have a properyty "#text" even if it is "",
-       remove that if-else and use code that is currently in else block
-       */
-      if (xmlNode.nodeValue.trim() == "") {
-        return;
-      }
-      else {
-        result[xmlNode.nodeName] = xmlNode.nodeValue;
-        return;
-      }
-    }
-
-    var jsonNode = {};
-    var existing = result[xmlNode.nodeName];
-    if (existing) {
-      if (!isArray(existing)) {
-        result[xmlNode.nodeName] = [existing, jsonNode];
-      }
-      else {
-        result[xmlNode.nodeName].push(jsonNode);
-      }
-    }
-    else {
-      if (arrayTags && arrayTags.indexOf(xmlNode.nodeName) != -1) {
-        result[xmlNode.nodeName] = [jsonNode];
-      }
-      else {
-        result[xmlNode.nodeName] = jsonNode;
-      }
-    }
-
-    if (xmlNode.attributes) {
-      var length = xmlNode.attributes.length;
-      for (var i = 0; i < length; i++) {
-        var attribute = xmlNode.attributes[i];
-        jsonNode[attribute.nodeName] = attribute.nodeValue;
-      }
-    }
-
-    if (xmlNode.childNodes){
-      var length = xmlNode.childNodes.length;
-      for (var i = 0; i < length; i++) {
-        parseNode(xmlNode.childNodes[i], jsonNode);
-      }
-    }
-
-  }
-
-  var result = {};
-  parseNode(xml, result);
-  return processData(result).scxml;
-}
-var DOMParser = require("xmldom").DOMParser;
 // Make sure we got a filename on the command line.
 if (process.argv.length < 4) {
   console.log('Usage: node ' + process.argv[1] + ' input ouput template');
@@ -118,12 +24,9 @@ var fs = require('fs')
   , output = process.argv[3]
   , templatePath = __dirname+'/templates/state.mustache';
 
-//console.log("TEMPLATE:", templatePath);
 var data = fs.readFileSync(filename, 'utf8');
-const res =   new DOMParser().parseFromString(data,"text/xml").documentElement;
-//console.log(JSON.stringify(parseXml(res)))
-const root = parseXml(res);
-//console.log(JSON.stringify(root));
+const root = transform(data);
+//console.log("ROOT:",JSON.stringify(root));
 root.id = '__Root';
 
 var states = [];
@@ -147,65 +50,51 @@ function wrapTry(res){
   return res;
   //return `try {${res}} catch (e){ console.error(e.stack)}`;
 }
+function convert(el){
+  if (el.$type === 'assign'){
+    return `this.${el.location.expr} = ${el.expr.expr}`;
+  }
+  var res = `this.sm.${el.$type}({`;
+  Object.keys(el).forEach(key=>{
+    if (key === 'content' || key === 'expr' || key==='location'){
+      var value = el[key];
+      if (typeof value === 'object'){
+        value = value.expr;
+      }
+      res += `${key}: () => {return ${value}}, \n`
+    } else {
+      res += key + ": '" + el[key] + "',\n"
+    }
+  })
+  res+='})\n';
+  return res;
+}
 function generate(root, states, parent, parentProps){
   var id = root.id;
   assert(id, "id is not defined for element:" + JSON.stringify(root));
   var lid = id.charAt(0).toLowerCase() + id.slice(1);
-  var onentry = [];
-  if (root.onentry){
-    if (root.onentry.assign){
-      //console.log(root.onentry.promise);
-      onentry = onentry.concat(asArray(root.onentry.assign).map(el=>`this.${el.location} = ${el.expr}`));
-    }
-    if (root.onentry.script){
-      onentry = onentry.concat(asArray(root.onentry.script));
-    }
-    if (root.onentry.promise){
-      //console.log(root.onentry.promise);
-      onentry = onentry.concat(asArray(root.onentry.promise).map(el=>`this.promise(${el})`));
-    }
-    if (root.onentry.on){
-      //console.log(root.onentry.promise);
-      onentry = onentry.concat(asArray(root.onentry.on).map(el=>`this.on(${el.stream}, "${el.target}")`));
-    }
+  if (root.onEntry){
+    root.onEntry = wrapWithFunction(root.onEntry.map(convert), false);
   }
-  if (onentry.length){
-    onentry = wrapWithFunction(onentry, false);
-  } else {
-    onentry = null;
+  if (root.onExit) {
+    root.onExit = wrapWithFunction(root.onExit.map(convert), false);
   }
-  var onexit = null;
-  if (root.onexit && root.onexit.script){
-    if (Array.isArray(root.onexit.script)){
-      onexit = root.onexit.script.join(';');
-    } else {
-      onexit = root.onexit.script;
-    }
-    onexit = wrapWithFunction(onexit, false);
-  }
-  var transition = root.transition;
+  var transition = null;
   var methods = [];
   var exists = {};
   var data;
   var props = {};
   var vars = {};
-  var datamodel = root.datamodel;
-  if (datamodel){
-    data = datamodel.data;
-    if (data){
-      if (!Array.isArray(data)){
-        data = [data];
-      }
-    }
-    data.forEach(p=> {
+  if (root.datamodel){
+    root.datamodel.forEach(p=> {
       if (parentProps[p.id]){
         delete parentProps[p.id];
       }
-      if (p.expr && p.expr.indexOf('this.sm.') !== -1) {
-        vars[p.id] = p.expr;
+      if (p.expr && p.expr.expr.indexOf('this.sm.') !== -1) {
+        vars[p.id] = p.expr.expr;
       } else {
         if (p.expr){
-          props[p.id] = p.expr;
+          props[p.id] = p.expr.expr;
         } else {
           props[p.id] = 'undefined';
         }
@@ -216,16 +105,13 @@ function generate(root, states, parent, parentProps){
   Object.assign(allProps, vars);
   Object.assign(allProps, props);
 
-  if (transition){
-    if (!Array.isArray(transition)){
-      transition = [transition];
-    }
-    transition.forEach(t=> {
+  if (root.transitions){
+    root.transitions.forEach(t=> {
       if (t.onentry){
-        t.ontransition = wrapWithFunction(t.onentry, false);
+        t.ontransition = wrapWithFunction(t.onentry.expr, false);
       }
       if (t.cond){
-        t.cond = wrapWithFunction(t.cond, true);
+        t.cond = wrapWithFunction(t.cond.expr, true);
       }
       t.name = t.event || 'default';
       if (!exists[t.name] && t.name !== "success" && t.name !== "failure"){
@@ -234,19 +120,27 @@ function generate(root, states, parent, parentProps){
       }
     });
   }
-  var type = root.type;
-  var children = asArray(root.state);
-  // parallel state
-  if (root.parallel){
-    var el = {};
-    Object.assign(el, root.parallel);
-    el.type = 'parallel';
-    children.push(el);
+  var res = {parent, vars:toArray(vars), props:toArray(props),
+    parentProps:toArray(parentProps), id, lid, methods, states:root.states, transitions:root.transitions};
+    var params = [];
+  Object.keys(root).forEach(key=>{
+    if (!res[key]){
+      var value = root[key];
+      if (typeof value === 'string' && (key !== 'onEntry' && key !== 'onExit')){
+        value = `'${value}'`;
+      }
+      if (key.indexOf('/')===-1 && (typeof value !== 'object')){
+        params.push({key, value});
+      }
+    }
+  });
+  res.params = params;
+  states.push( res );
+  if (root.states){
+    root.states.forEach(s => {
+      generate(s, states, id, allProps);
+    })
   }
-  states.push( {parent, vars:toArray(vars), props:toArray(props), parentProps:toArray(parentProps), type, id, lid, initial:root.initial, state:children, transition:root.transition, onentry, onexit, methods});
-  children.forEach(s => {
-    generate(s, states, id, allProps);
-  })
 }
 
 generate(root, states, '', {});

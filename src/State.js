@@ -52,27 +52,6 @@ export default class State {
     this.onExit = onexit;
   }
   
-  promise = (res)=> {
-    //console.log("RESULT:", res);
-    if (res && res.then){
-      res.then(response=>{
-        //console.log("SUCCESS:", response);
-        this.success(response);
-      }).catch(e => {
-        console.error(e);
-        this.failure(e)
-      });
-    } else {
-        setTimeout(()=>res ? this.success(res) : this.failure(res));
-    }
-  };
-
-  on(stream, event) {
-    if (!this.handlers[event]){
-      this.handlers[event] = stream.onValue(e => this.sm.handle(event, e));
-    }
-  }
-
   success = (data) => {
     this.sm.handle("success", data);
   };

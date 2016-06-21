@@ -1,6 +1,6 @@
 {
   "name": "statem",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "Harel Statecharts state machine with code generation from SCXML statecharts",
   "main": "index.js",
   "scripts": {
@@ -24,6 +24,7 @@
     "mobx": "^2.3.2",
     "mustache": "^2.2.1",
     "scion-core": "^1.1.3",
+    "scxml": "^2.0.13",
     "xmldom": "^0.1.22"
   },
   "devDependencies": {

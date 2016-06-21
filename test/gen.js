@@ -18,4 +18,16 @@ describe("test", function() {
     expect(state.state).to.be.equal("Load_Data");
 
   });
+  it("expect login scene", function(){
+    const state = createSM({ storage: {load: ()=>{}}});
+    state.start();
+    expect(state.state).to.be.equal("Load_Data");
+    state.success();
+    expect(state.state).to.be.equal("PromoScene");
+    state.handle("error");
+    expect(state.state).to.be.equal("Error");
+    state.handle("handled");
+    expect(state.state).to.be.equal("PromoScene");
+
+  });
 });
