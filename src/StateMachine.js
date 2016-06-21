@@ -26,7 +26,11 @@ export default class StateMachine {
     this.interpreter.registerListener({
       onEntry: (state)=>{this.state = state;console.log(`Entering state ${state}`)},
       onTransition: (from, to)=>console.log(`Transition from ${from} to ${to}`),
-      onExit: (state)=>console.log(`Exit state ${state}`)});
+      onExit: (state)=>{console.log(`Exit state ${state}`)}});
+  }
+  
+  isIn = (state) => {
+    return this.interpreter.isIn(state);
   }
 
   start = () => {
@@ -37,37 +41,65 @@ export default class StateMachine {
     this.interpreter.gen(event, data);
   };
 
-  promise = ({content, $column, $line})=> {
+  promise = ({wrap, content, $column, $line})=> {
     var res;
+    var key, error;
+    if (wrap){
+      key = 'response';
+      error = 'error';
+    }
     try {
       res = content();
     } catch (e){
-      throw(`scxml eval error, column: ${$column} line: ${$line}, ${e}`);
+      console.error(`scxml eval error, column: ${$column} line: ${$line}, ${e}`);
     }
-    console.log("RESULT:", res);
     if (res && res.then){
       res.then(response=>{
-        //console.log("SUCCESS:", response);
-        this.success(response);
+        this.success(key ? {[key]: response} : response);
       }).catch(e => {
         throw(`scxml eval error, column: ${$column} line: ${$line}, ${e}`);
-        this.failure(e)
+        this.failure(error ? {[error]: e} : e)
       });
     } else {
-      setTimeout(()=>res ? this.success(res) : this.failure(res));
+      setTimeout(()=>res ? this.success(key ? {[key] : res} : res) : this.failure([error]? {[error] : res} : res));
     }
   };
 
   // content here must return KefirJS stream
-  on({content, target}) {
+  on({content, event}) {
     const stream = content();
-    if (!this.handlers[target]){
-      this.handlers[target] = stream.onValue(e => this.handle(target, e));
+    if (!this.handlers[event]){
+      this.handlers[event] = stream.onValue(e => this.handle(event, e));
     }
   }
 
-  pass({content}){
-    setTimeout(()=>this.handle("pass", content()));
+  action({event, expr, $column, $line, cond}){
+    try {
+      if (cond && !cond()) {
+        console.log(`condition is false to triger event=${event}, ignore`)
+        return;
+      }
+    } catch (e){
+      console.error(`scxml eval error, column: ${$column} line: ${$line}, ${e}`);
+    }
+    setTimeout(()=>{
+      const data = expr();
+      // it means that data is already processed
+      if (data.response || data.error){
+        console.log("Action was already executed, run transition");
+        if (data.response){
+          this.success(data.response);
+        } else {
+          this.failure(data.error);
+        }
+      } else {
+        try {
+          this.handle(event, data)
+        } catch (e){
+          console.error(`scxml eval error, column: ${$column} line: ${$line}, ${e}`);
+        }
+      }
+    });
   }
 
   script({content, $column, $line}) {

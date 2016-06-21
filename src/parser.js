@@ -56,7 +56,7 @@ function convert(el){
   }
   var res = `this.sm.${el.$type}({`;
   Object.keys(el).forEach(key=>{
-    if (key === 'content' || key === 'expr' || key==='location'){
+    if (key === 'content' || key === 'expr' || key==='location' || key==='cond'){
       var value = el[key];
       if (typeof value === 'object'){
         value = value.expr;

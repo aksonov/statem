@@ -14,9 +14,6 @@ export default class Transition {
   constructor(parent, data) {
     assert(data, "Data should be defined");
     let {event, cond, target, onentry} = data;
-    if (!cond){
-      cond = ()=>true;
-    }
     assert(parent, "Parent should be defined for transition: " + event);
 
     this.parent = parent;
