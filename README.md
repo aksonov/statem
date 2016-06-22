@@ -9,7 +9,7 @@ David Harel in the 1980s introduced *statechart* (now it became part of UML spec
 
 Here is the state chart diagram that describes the behavior of a stopwatch:
 
-![image](https://raw.githubusercontent.com/aksonov/statem/master/docs/images/statechart0.png)
+![statechart0](https://cloud.githubusercontent.com/assets/1321329/16263277/bfb65bb8-3873-11e6-8aa2-7c541e29c2fb.png)
 
 The SCXML file describing the transitions in this diagram is:
 
