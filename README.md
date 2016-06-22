@@ -197,15 +197,7 @@ statem.stateId.onEntry = (_event)=>{...}
 
 Note that all your State IDs should be unique and should start with upper case (like Javascript classes), don't contain space and other special characters (i.e. be valid Javascript identifier). `statem` adds all of them to its instance (starting with lower case). So if you have state ID `Register`, you could access its data via `statem.register`. You may also use register generated class with `import {RegisterState} from '../gen/state'` for strict Flow type checking.
 
-* pass `statem` to your `Router` (if you are using `RNRF` component) or just to your React Native component:
-
-```
-<Router statem={statem}>
-...
-</Router>
-```
-
-* Inside your component you could use all state transitions and other data as simple javascript method call:
+* Inside your code you could use all state transitions and other data as simple javascript method call:
 
 ```
 statem.success({resource: DeviceInfo.getUniqueID(), provider_data})
