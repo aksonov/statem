@@ -12,6 +12,7 @@ export default class StateMachine {
   interpreter;
   _states = {};
   @observable state;
+  @observable states = [];
   handlers = {};
 
   constructor(state, stateClass, props = {}){
@@ -23,14 +24,18 @@ export default class StateMachine {
         return actionRef.call(this._scriptingContext, currentEvent);     //SCXML system variables
     };
 
-    this.interpreter.registerListener({
-      onEntry: (state)=>{this.state = state;console.log(`Entering state ${state}`)},
-      onTransition: (from, to)=>console.log(`Transition from ${from} to ${to}`),
-      onExit: (state)=>{console.log(`Exit state ${state}`)}});
   }
   
+  enterState = (state) => {
+    this.state = state;if (!this.states.find(el=>el === state)) this.states.push(state);;
+  }
+  
+  exitState = (state) => {
+    this.states.replace(this.states.filter(el=>el !== state))
+  } 
+  
   isIn = (state) => {
-    return this.interpreter.isIn(state);
+    return this.states.find(el=>el === state);
   }
 
   start = () => {
@@ -43,10 +48,9 @@ export default class StateMachine {
 
   promise = ({wrap, content, $column, $line})=> {
     var res;
-    var key, error;
+    var key;
     if (wrap){
       key = 'response';
-      error = 'error';
     }
     try {
       res = content();
@@ -57,11 +61,11 @@ export default class StateMachine {
       res.then(response=>{
         this.success(key ? {[key]: response} : response);
       }).catch(e => {
-        throw(`scxml eval error, column: ${$column} line: ${$line}, ${e}`);
-        this.failure(error ? {[error]: e} : e)
+        //throw(`scxml eval error, column: ${$column} line: ${$line}, ${e}`);
+        this.failure({ error: e })
       });
     } else {
-      setTimeout(()=>res ? this.success(key ? {[key] : res} : res) : this.failure([error]? {[error] : res} : res));
+      setTimeout(()=>res ? this.success(key ? {[key] : res} : res) : this.failure( {error : res}));
     }
   };
 

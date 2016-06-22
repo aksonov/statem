@@ -7,8 +7,7 @@ import assert from 'assert';
 
 export default class State {
   id;
-  onEntry;
-  onExit;
+  props = {};
   states;
   transitions;
   sm;
@@ -48,9 +47,30 @@ export default class State {
       this.states = state.map(el => new State(el, sm));
     }
     
-    this.onEntry = onentry;
-    this.onExit = onexit;
+    this.onentry = onentry;
+    this.onexit = onexit;
   }
+
+  onEntry = (_event) => {
+    console.log(`ENTERING STATE: ${this.id} EVENT:${JSON.stringify(_event)}`);
+    // assign all values to the state
+    if (_event && _event.data){
+      this.props = _event.data;
+    }
+    if (this.onentry){
+      this.onentry(_event);
+    }
+    this.sm.enterState(this.id);
+  };
+
+  onExit = (_event) => {
+    this.props = null;
+    if (this.onexit){
+      this.onexit(_event);
+    }
+    this.sm.exitState(this.id);
+  };
+
   
   success = (data) => {
     this.sm.handle("success", data);

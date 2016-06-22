@@ -74,10 +74,12 @@ function generate(root, states, parent, parentProps){
   assert(id, "id is not defined for element:" + JSON.stringify(root));
   var lid = id.charAt(0).toLowerCase() + id.slice(1);
   if (root.onEntry){
-    root.onEntry = wrapWithFunction(root.onEntry.map(convert), false);
+    root.onentry = wrapWithFunction(root.onEntry.map(convert), false);
+    delete root.onEntry;
   }
   if (root.onExit) {
-    root.onExit = wrapWithFunction(root.onExit.map(convert), false);
+    root.onexit = wrapWithFunction(root.onExit.map(convert), false);
+    delete root.onExit;
   }
   var transition = null;
   var methods = [];
@@ -126,7 +128,7 @@ function generate(root, states, parent, parentProps){
   Object.keys(root).forEach(key=>{
     if (!res[key]){
       var value = root[key];
-      if (typeof value === 'string' && (key !== 'onEntry' && key !== 'onExit')){
+      if (typeof value === 'string' && (key !== 'onentry' && key !== 'onexit')){
         value = `'${value}'`;
       }
       if (key.indexOf('/')===-1 && (typeof value !== 'object')){
