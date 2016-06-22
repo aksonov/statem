@@ -1,5 +1,5 @@
-# statem
-Harel Statechart Machine with SCXML code generation
+# Statem
+Harel Statechart Machine with SCXML to ES6 code generation
 
 The big problem with complex application state is how to understand it and see whole picture from source code.
 "A Picture Costs A Thousand Words" - it is true for application state as well. UML solves this problem but requires additional
@@ -43,9 +43,9 @@ However SCION's auto-generated code is not ES6 based and doesn't have Flow-stric
 
 To visualize and edit our application statechart we are using SCXML GUI editor [scxmlgui](https://github.com/fmorbini/scxmlgui). It works with SCXML files, allows export to SVG/PNG/DOT and many other formats. Also you could edit SCXML manually because it has very simple and clear structure.
 
-Here is simplified state of our app (created with scxmlgui):
+Here is simplified state of some typical messaging app (created with scxmlgui):
 
-![image](https://github.com/aksonov/statem/blob/master/docs/images/statechart2.svg)
+![statechart](https://cloud.githubusercontent.com/assets/1321329/16266129/8fc53810-3883-11e6-8f65-66d14fc3b19a.png)
 
 You can see here compoud states (`Root`, `Connected`, `Main`) and parallel states (`LoggedScene`, `Friends`, `Messaging`).
 
@@ -53,7 +53,7 @@ But how we could connect our application logic with this statechart?
 Let's check SCXML file here.
 
 ```xml
-<scxml name="TinyRobot" version="1.0" xmlns="http://www.w3.org/2005/07/scxml">
+<scxml version="1.0" xmlns="http://www.w3.org/2005/07/scxml">
   <datamodel>
     <data expr="this.sm.storage" id="storage"/>
     <data expr="this.sm.xmpp" id="xmppStore"/>
@@ -197,15 +197,7 @@ statem.stateId.onEntry = (_event)=>{...}
 
 Note that all your State IDs should be unique and should start with upper case (like Javascript classes), don't contain space and other special characters (i.e. be valid Javascript identifier). `statem` adds all of them to its instance (starting with lower case). So if you have state ID `Register`, you could access its data via `statem.register`. You may also use register generated class with `import {RegisterState} from '../gen/state'` for strict Flow type checking.
 
-* pass `statem` to your `Router` (if you are using `RNRF` component) or just to your React Native component:
-
-```
-<Router statem={statem}>
-...
-</Router>
-```
-
-* Inside your component you could use all state transitions and other data as simple javascript method call:
+* Inside your code you could use all state transitions and other data as simple javascript method call:
 
 ```
 statem.success({resource: DeviceInfo.getUniqueID(), provider_data})
