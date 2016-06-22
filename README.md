@@ -1,5 +1,5 @@
-# statem
-Harel Statechart Machine with SCXML code generation
+# Statem
+Harel Statechart Machine with SCXML to ES6 code generation
 
 The big problem with complex application state is how to understand it and see whole picture from source code.
 "A Picture Costs A Thousand Words" - it is true for application state as well. UML solves this problem but requires additional
