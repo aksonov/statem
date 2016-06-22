@@ -53,7 +53,7 @@ But how we could connect our application logic with this statechart?
 Let's check SCXML file here.
 
 ```xml
-<scxml name="TinyRobot" version="1.0" xmlns="http://www.w3.org/2005/07/scxml">
+<scxml version="1.0" xmlns="http://www.w3.org/2005/07/scxml">
   <datamodel>
     <data expr="this.sm.storage" id="storage"/>
     <data expr="this.sm.xmpp" id="xmppStore"/>
