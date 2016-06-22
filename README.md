@@ -43,9 +43,9 @@ However SCION's auto-generated code is not ES6 based and doesn't have Flow-stric
 
 To visualize and edit our application statechart we are using SCXML GUI editor [scxmlgui](https://github.com/fmorbini/scxmlgui). It works with SCXML files, allows export to SVG/PNG/DOT and many other formats. Also you could edit SCXML manually because it has very simple and clear structure.
 
-Here is simplified state of our app (created with scxmlgui):
+Here is simplified state of some typical messaging app (created with scxmlgui):
 
-![image](https://github.com/aksonov/statem/blob/master/docs/images/statechart2.svg)
+![statechart](https://cloud.githubusercontent.com/assets/1321329/16266129/8fc53810-3883-11e6-8f65-66d14fc3b19a.png)
 
 You can see here compoud states (`Root`, `Connected`, `Main`) and parallel states (`LoggedScene`, `Friends`, `Messaging`).
 
