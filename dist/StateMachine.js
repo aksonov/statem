@@ -1,0 +1,285 @@
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = undefined;
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _class, _desc, _value, _class2, _descriptor, _descriptor2, _class3, _temp, _initialiseProps; // Copyright (c) 2016, Pavlo Aksonov
+// All rights reserved.
+
+var _scionCore = require('scion-core');
+
+var _scionCore2 = _interopRequireDefault(_scionCore);
+
+var _State = require('./State');
+
+var _State2 = _interopRequireDefault(_State);
+
+var _autobindDecorator = require('autobind-decorator');
+
+var _autobindDecorator2 = _interopRequireDefault(_autobindDecorator);
+
+var _assert = require('assert');
+
+var _assert2 = _interopRequireDefault(_assert);
+
+var _mobx = require('mobx');
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+function _initDefineProp(target, property, descriptor, context) {
+  if (!descriptor) return;
+  Object.defineProperty(target, property, {
+    enumerable: descriptor.enumerable,
+    configurable: descriptor.configurable,
+    writable: descriptor.writable,
+    value: descriptor.initializer ? descriptor.initializer.call(context) : void 0
+  });
+}
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _applyDecoratedDescriptor(target, property, decorators, descriptor, context) {
+  var desc = {};
+  Object['ke' + 'ys'](descriptor).forEach(function (key) {
+    desc[key] = descriptor[key];
+  });
+  desc.enumerable = !!desc.enumerable;
+  desc.configurable = !!desc.configurable;
+
+  if ('value' in desc || desc.initializer) {
+    desc.writable = true;
+  }
+
+  desc = decorators.slice().reverse().reduce(function (desc, decorator) {
+    return decorator(target, property, desc) || desc;
+  }, desc);
+
+  if (context && desc.initializer !== void 0) {
+    desc.value = desc.initializer ? desc.initializer.call(context) : void 0;
+    desc.initializer = undefined;
+  }
+
+  if (desc.initializer === void 0) {
+    Object['define' + 'Property'](target, property, desc);
+    desc = null;
+  }
+
+  return desc;
+}
+
+function _initializerWarningHelper(descriptor, context) {
+  throw new Error('Decorating class property failed. Please ensure that transform-class-properties is enabled.');
+}
+
+var StateMachine = (0, _autobindDecorator2.default)(_class = (_class2 = (_temp = _class3 = function () {
+  function StateMachine(state, stateClass) {
+    var props = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
+
+    _classCallCheck(this, StateMachine);
+
+    _initialiseProps.call(this);
+
+    Object.assign(this, props);
+    var StateClass = stateClass || _State2.default;
+    var data = new StateClass(state, null, this);
+    this.interpreter = new _scionCore2.default.Statechart(data, { console: console });
+    this.interpreter._evaluateAction = function (currentEvent, actionRef) {
+      return actionRef.call(this._scriptingContext, currentEvent); //SCXML system variables
+    };
+  }
+
+  _createClass(StateMachine, [{
+    key: 'on',
+
+
+    // content here must return KefirJS stream
+    value: function on(_ref) {
+      var _this = this;
+
+      var content = _ref.content;
+      var event = _ref.event;
+
+      var stream = content();
+      if (!this.handlers[event]) {
+        this.handlers[event] = stream.onValue(function (e) {
+          return _this.handle(event, e);
+        });
+      }
+    }
+  }, {
+    key: 'action',
+    value: function action(_ref2) {
+      var _this2 = this;
+
+      var event = _ref2.event;
+      var expr = _ref2.expr;
+      var $column = _ref2.$column;
+      var $line = _ref2.$line;
+      var cond = _ref2.cond;
+
+      try {
+        if (cond && !cond()) {
+          console.log('condition is false to triger event=' + event + ', ignore');
+          return;
+        }
+      } catch (e) {
+        console.error('scxml eval error, column: ' + $column + ' line: ' + $line + ', ' + e);
+      }
+      setTimeout(function () {
+        var data = expr();
+        // it means that data is already processed
+        if (data.response || data.error) {
+          console.log("Action was already executed, run transition");
+          if (data.response) {
+            _this2.success(data.response);
+          } else {
+            _this2.failure(data.error);
+          }
+        } else {
+          try {
+            _this2.handle(event, data);
+          } catch (e) {
+            console.error('scxml eval error, column: ' + $column + ' line: ' + $line + ', ' + e);
+          }
+        }
+      });
+    }
+  }, {
+    key: 'script',
+    value: function script(_ref3) {
+      var content = _ref3.content;
+      var $column = _ref3.$column;
+      var $line = _ref3.$line;
+
+      try {
+        content();
+      } catch (e) {
+        throw 'scxml eval error, column: ' + $column + ' line: ' + $line + ', ' + e;
+      }
+    }
+  }, {
+    key: 'log',
+    value: function log(_ref4) {
+      var expr = _ref4.expr;
+      var $column = _ref4.$column;
+      var $line = _ref4.$line;
+
+      try {
+        console.log(expr());
+      } catch (e) {
+        throw 'scxml eval error, column: ' + $column + ' line: ' + $line + ', ' + e;
+      }
+    }
+  }, {
+    key: 'addState',
+    value: function addState(state) {
+      (0, _assert2.default)(!this._states[state.id], 'State ' + state.id + ' already exists');
+      this._states[state.id] = state;
+    }
+  }, {
+    key: 'getState',
+    value: function getState(stateName) {
+      return this._states[stateName];
+    }
+  }]);
+
+  return StateMachine;
+}(), _initialiseProps = function _initialiseProps() {
+  var _this3 = this;
+
+  this._states = {};
+
+  _initDefineProp(this, 'state', _descriptor, this);
+
+  _initDefineProp(this, 'states', _descriptor2, this);
+
+  this.handlers = {};
+
+  this.enterState = function (state) {
+    _this3.state = state;if (!_this3.states.find(function (el) {
+      return el === state;
+    })) _this3.states.push(state);;
+  };
+
+  this.exitState = function (state) {
+    _this3.states.replace(_this3.states.filter(function (el) {
+      return el !== state;
+    }));
+  };
+
+  this.isIn = function (state) {
+    return _this3.states.find(function (el) {
+      return el === state;
+    });
+  };
+
+  this.start = function () {
+    _this3.interpreter.start();
+  };
+
+  this.handle = function (event, data) {
+    _this3.interpreter.gen(event, data);
+  };
+
+  this.promise = function (_ref5) {
+    var wrap = _ref5.wrap;
+    var content = _ref5.content;
+    var $column = _ref5.$column;
+    var $line = _ref5.$line;
+
+    var res;
+    var key;
+    if (wrap) {
+      key = 'response';
+    }
+    try {
+      res = content();
+    } catch (e) {
+      console.error('scxml eval error, column: ' + $column + ' line: ' + $line + ', ' + e);
+    }
+    if (res && res.then) {
+      res.then(function (response) {
+        _this3.success(key ? _defineProperty({}, key, response) : response);
+      }).catch(function (e) {
+        //throw(`scxml eval error, column: ${$column} line: ${$line}, ${e}`);
+        _this3.failure({ error: e });
+      });
+    } else {
+      setTimeout(function () {
+        return res ? _this3.success(key ? _defineProperty({}, key, res) : res) : _this3.failure({ error: res });
+      });
+    }
+  };
+
+  this.currentState = function () {
+    return _this3.interpreter.getConfiguration()[0];
+  };
+
+  this.currentStates = function () {
+    return _this3.interpreter.getConfiguration();
+  };
+
+  this.success = function (data) {
+    _this3.handle("success", data);
+  };
+
+  this.failure = function (data) {
+    _this3.handle("failure", data);
+  };
+}, _temp), (_descriptor = _applyDecoratedDescriptor(_class2.prototype, 'state', [_mobx.observable], {
+  enumerable: true,
+  initializer: null
+}), _descriptor2 = _applyDecoratedDescriptor(_class2.prototype, 'states', [_mobx.observable], {
+  enumerable: true,
+  initializer: function initializer() {
+    return [];
+  }
+})), _class2)) || _class;
+
+exports.default = StateMachine;

@@ -1,12 +1,14 @@
 {
   "name": "statem",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "description": "Harel Statecharts state machine with code generation from SCXML statecharts",
-  "main": "index.js",
+  "main": "dist/index.js",
   "scripts": {
     "test": "npm run gen;mocha ./test/*.js --require babel-core/register  --require babel-polyfill --require mocha-steps --timeout 1000;rm test/genstate.js",
     "watch": "./node_modules/watchman/watchman test/test.scxml 'npm run gen'",
-    "gen": "node src/parser.js test/test.scxml test/genstate.js test"
+    "gen": "node src/parser.js test/test.scxml test/genstate.js test",
+      "build": "babel src -d dist --presets es2015,react,stage-1 --plugins transform-decorators-legacy",
+     "serve": "node dist/index.js"
   },
   "repository": {
     "type": "git",
