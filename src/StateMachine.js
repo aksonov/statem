@@ -23,6 +23,9 @@ export default class StateMachine {
     this.interpreter._evaluateAction = function(currentEvent, actionRef) {
         return actionRef.call(this._scriptingContext, currentEvent);     //SCXML system variables
     };
+    if (props.listener){
+      this.interpreter.registerListener(props.listener);
+    }
 
   }
   
@@ -43,19 +46,22 @@ export default class StateMachine {
   };
 
   handle = (event, data) => {
-    this.interpreter.gen(event, data);
+    console.log(`EVENT: ${event} DATA: ${data}`);
+    setTimeout(()=>this.interpreter.gen(event, data));
   };
 
   promise = ({wrap, content, $column, $line})=> {
     var res;
     var key;
+    var error;
     if (wrap){
       key = 'response';
     }
     try {
       res = content();
     } catch (e){
-      console.error(`scxml eval error, column: ${$column} line: ${$line}, ${e}`);
+      error  = `scxml eval error, column: ${$column} line: ${$line}, ${e}`;
+      console.error(error);
     }
     if (res && res.then){
       res.then(response=>{
@@ -65,7 +71,11 @@ export default class StateMachine {
         this.failure({ error: e })
       });
     } else {
-      setTimeout(()=>res ? this.success(key ? {[key] : res} : res) : this.failure( {error : res}));
+      if (res){
+        this.success(key ? {[key] : res} : res)
+      } else {
+        this.failure( {error});
+      }
     }
   };
 
@@ -77,33 +87,31 @@ export default class StateMachine {
     }
   }
 
-  action({event, expr, $column, $line, cond}){
+  action({event, expr, $column, $line, cond}) {
     try {
       if (cond && !cond()) {
         console.log(`condition is false to triger event=${event}, ignore`)
         return;
       }
-    } catch (e){
+    } catch (e) {
       console.error(`scxml eval error, column: ${$column} line: ${$line}, ${e}`);
     }
-    setTimeout(()=>{
-      const data = expr();
-      // it means that data is already processed
-      if (data.response || data.error){
-        console.log("Action was already executed, run transition");
-        if (data.response){
-          this.success(data.response);
-        } else {
-          this.failure(data.error);
-        }
+    const data = expr();
+    // it means that data is already processed
+    if (data.response || data.error) {
+      console.log("Action was already executed, run transition");
+      if (data.response) {
+        this.success(data.response);
       } else {
-        try {
-          this.handle(event, data)
-        } catch (e){
-          console.error(`scxml eval error, column: ${$column} line: ${$line}, ${e}`);
-        }
+        this.failure(data.error);
       }
-    });
+    } else {
+      try {
+        this.handle(event, data)
+      } catch (e) {
+        console.error(`scxml eval error, column: ${$column} line: ${$line}, ${e}`);
+      }
+    }
   }
 
   script({content, $column, $line}) {

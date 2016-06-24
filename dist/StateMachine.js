@@ -92,6 +92,9 @@ var StateMachine = (0, _autobindDecorator2.default)(_class = (_class2 = (_temp =
     this.interpreter._evaluateAction = function (currentEvent, actionRef) {
       return actionRef.call(this._scriptingContext, currentEvent); //SCXML system variables
     };
+    if (props.listener) {
+      this.interpreter.registerListener(props.listener);
+    }
   }
 
   _createClass(StateMachine, [{
@@ -115,8 +118,6 @@ var StateMachine = (0, _autobindDecorator2.default)(_class = (_class2 = (_temp =
   }, {
     key: 'action',
     value: function action(_ref2) {
-      var _this2 = this;
-
       var event = _ref2.event;
       var expr = _ref2.expr;
       var $column = _ref2.$column;
@@ -131,24 +132,22 @@ var StateMachine = (0, _autobindDecorator2.default)(_class = (_class2 = (_temp =
       } catch (e) {
         console.error('scxml eval error, column: ' + $column + ' line: ' + $line + ', ' + e);
       }
-      setTimeout(function () {
-        var data = expr();
-        // it means that data is already processed
-        if (data.response || data.error) {
-          console.log("Action was already executed, run transition");
-          if (data.response) {
-            _this2.success(data.response);
-          } else {
-            _this2.failure(data.error);
-          }
+      var data = expr();
+      // it means that data is already processed
+      if (data.response || data.error) {
+        console.log("Action was already executed, run transition");
+        if (data.response) {
+          this.success(data.response);
         } else {
-          try {
-            _this2.handle(event, data);
-          } catch (e) {
-            console.error('scxml eval error, column: ' + $column + ' line: ' + $line + ', ' + e);
-          }
+          this.failure(data.error);
         }
-      });
+      } else {
+        try {
+          this.handle(event, data);
+        } catch (e) {
+          console.error('scxml eval error, column: ' + $column + ' line: ' + $line + ', ' + e);
+        }
+      }
     }
   }, {
     key: 'script',
@@ -191,7 +190,7 @@ var StateMachine = (0, _autobindDecorator2.default)(_class = (_class2 = (_temp =
 
   return StateMachine;
 }(), _initialiseProps = function _initialiseProps() {
-  var _this3 = this;
+  var _this2 = this;
 
   this._states = {};
 
@@ -202,29 +201,32 @@ var StateMachine = (0, _autobindDecorator2.default)(_class = (_class2 = (_temp =
   this.handlers = {};
 
   this.enterState = function (state) {
-    _this3.state = state;if (!_this3.states.find(function (el) {
+    _this2.state = state;if (!_this2.states.find(function (el) {
       return el === state;
-    })) _this3.states.push(state);;
+    })) _this2.states.push(state);;
   };
 
   this.exitState = function (state) {
-    _this3.states.replace(_this3.states.filter(function (el) {
+    _this2.states.replace(_this2.states.filter(function (el) {
       return el !== state;
     }));
   };
 
   this.isIn = function (state) {
-    return _this3.states.find(function (el) {
+    return _this2.states.find(function (el) {
       return el === state;
     });
   };
 
   this.start = function () {
-    _this3.interpreter.start();
+    _this2.interpreter.start();
   };
 
   this.handle = function (event, data) {
-    _this3.interpreter.gen(event, data);
+    console.log('EVENT: ' + event + ' DATA: ' + data);
+    setTimeout(function () {
+      return _this2.interpreter.gen(event, data);
+    });
   };
 
   this.promise = function (_ref5) {
@@ -235,42 +237,46 @@ var StateMachine = (0, _autobindDecorator2.default)(_class = (_class2 = (_temp =
 
     var res;
     var key;
+    var error;
     if (wrap) {
       key = 'response';
     }
     try {
       res = content();
     } catch (e) {
-      console.error('scxml eval error, column: ' + $column + ' line: ' + $line + ', ' + e);
+      error = 'scxml eval error, column: ' + $column + ' line: ' + $line + ', ' + e;
+      console.error(error);
     }
     if (res && res.then) {
       res.then(function (response) {
-        _this3.success(key ? _defineProperty({}, key, response) : response);
+        _this2.success(key ? _defineProperty({}, key, response) : response);
       }).catch(function (e) {
         //throw(`scxml eval error, column: ${$column} line: ${$line}, ${e}`);
-        _this3.failure({ error: e });
+        _this2.failure({ error: e });
       });
     } else {
-      setTimeout(function () {
-        return res ? _this3.success(key ? _defineProperty({}, key, res) : res) : _this3.failure({ error: res });
-      });
+      if (res) {
+        _this2.success(key ? _defineProperty({}, key, res) : res);
+      } else {
+        _this2.failure({ error: error });
+      }
     }
   };
 
   this.currentState = function () {
-    return _this3.interpreter.getConfiguration()[0];
+    return _this2.interpreter.getConfiguration()[0];
   };
 
   this.currentStates = function () {
-    return _this3.interpreter.getConfiguration();
+    return _this2.interpreter.getConfiguration();
   };
 
   this.success = function (data) {
-    _this3.handle("success", data);
+    _this2.handle("success", data);
   };
 
   this.failure = function (data) {
-    _this3.handle("failure", data);
+    _this2.handle("failure", data);
   };
 }, _temp), (_descriptor = _applyDecoratedDescriptor(_class2.prototype, 'state', [_mobx.observable], {
   enumerable: true,
