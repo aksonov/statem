@@ -22,18 +22,10 @@ var Transition = function Transition(parent, data) {
   _classCallCheck(this, Transition);
 
   (0, _assert2.default)(data, "Data should be defined");
-  var event = data.event;
-  var cond = data.cond;
-  var target = data.target;
-  var onentry = data.onentry;
-
+  Object.assign(this, data);
   (0, _assert2.default)(parent, "Parent should be defined for transition: " + event);
 
-  this.parent = parent;
-  this.event = event;
-  this.cond = cond;
-  this.target = target;
-  this.onTransition = onentry;
+  this.onTransition = data.onentry;
 };
 
 exports.default = Transition;

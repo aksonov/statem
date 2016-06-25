@@ -37,6 +37,7 @@ import {action, computed, observable} from 'mobx';
     {{#transitions }}
         transition.push({
         {{# event}} event: "{{event}}", {{/event}}
+        {{# type}} type: "{{type}}", {{/type}}
         {{# cond}} cond: {{& cond}}, {{/cond}}
         {{# target}} target:"{{ target }}", {{/target}}
         {{# ontransition}}onentry:{{& ontransition}}, {{/ ontransition}}

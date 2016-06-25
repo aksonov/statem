@@ -13,14 +13,10 @@ export default class Transition {
 
   constructor(parent, data) {
     assert(data, "Data should be defined");
-    let {event, cond, target, onentry} = data;
+    Object.assign(this, data);
     assert(parent, "Parent should be defined for transition: " + event);
 
-    this.parent = parent;
-    this.event = event;
-    this.cond = cond;
-    this.target = target;
-    this.onTransition = onentry;
+    this.onTransition = data.onentry;
     
   }
 }
