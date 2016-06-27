@@ -8,15 +8,26 @@ export default class Transition {
   event;
   parent;
   cond;
+  mode;
   target;
   onTransition;
 
   constructor(parent, data) {
     assert(data, "Data should be defined");
     Object.assign(this, data);
-    assert(parent, "Parent should be defined for transition: " + event);
+    assert(parent, "Parent should be defined for transition:" + this.event);
 
-    this.onTransition = data.onentry;
+    this.onTransition = (params)=>{
+      data.onentry && data.onentry(params);
+      if (this.mode === 'push'){
+        assert(data.target, "Target should be defined for push transition");
+        parent.push({name: data.target, data:params && params.data || {}});
+      }
+      if (this.mode === 'switch'){
+        assert(data.target, "Target should be defined for push transition");
+        parent.switch({name: data.target, data:params && params.data || {}});
+      }
+    }
     
   }
 }

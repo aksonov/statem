@@ -46,7 +46,7 @@ export default class StateMachine {
   };
 
   handle = (event, data) => {
-    console.log(`EVENT: ${event} DATA: ${data}`);
+    //console.log(`EVENT: ${event} DATA: ${data}`);
     setTimeout(()=>this.interpreter.gen(event, data));
   };
 

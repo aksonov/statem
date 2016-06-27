@@ -223,7 +223,7 @@ var StateMachine = (0, _autobindDecorator2.default)(_class = (_class2 = (_temp =
   };
 
   this.handle = function (event, data) {
-    console.log('EVENT: ' + event + ' DATA: ' + data);
+    //console.log(`EVENT: ${event} DATA: ${data}`);
     setTimeout(function () {
       return _this2.interpreter.gen(event, data);
     });

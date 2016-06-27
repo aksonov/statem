@@ -5,11 +5,11 @@ import StateMachine from '../src/StateMachine';
 
 describe("test", function() {
   it("throw error if no initial state", function(){
-    expect(()=>new State({id:'one', state:{id:'child'}})).to.throw('Initial state should be set for compoud state: one');
+    expect(()=>new StateMachine({id:'one', state:{id:'child'}})).to.throw('Initial state should be set for compoud state: one');
   });
 
   it("throw error if no initial state", function(){
-    expect(()=>new State({id:'one', initial:'child2',
+    expect(()=>new StateMachine({id:'one', initial:'child2',
       state:{id:'child'}})).to.throw('No state child2 exist for compud state one');
   });
 
@@ -35,22 +35,22 @@ describe("test", function() {
     sm.start();
   });
 
-  it("should create compoud state and two sub-states and handle transition", function(){
+  it("should create compoud state and two sub-states and handle transition", function(done){
     const sm = new StateMachine({id:'one', initial:'child1',
       state:[{id:'child1', transition:{event:'go', target:'child2'}}, {id:'child2'}]});
     sm.start();
     expect(sm.state).to.be.equal('child1');
     sm.handle('go');
-    expect(sm.state).to.be.equal('child2');
+    when( ()=>sm.state === 'child2', done)
   });
   //
   it("should create compoud state and two sub-states and handle transition", function(done){
     const sm = new StateMachine({id:'one', initial:'child1',
-      state:[{id:'child1', transition:{event:'go', target:'child2'}}, {id:'child2', onentry:({data:{a,b}})=>{if (a==1 && b==2) done();}}]});
+      state:[{id:'child1',transition:{event:'go', target:'child2'}}, {id:'child2'}],});
     sm.start();
     expect(sm.state).to.be.equal('child1');
     sm.handle('go', {a:1, b:2});
-    expect(sm.state).to.be.equal('child2');
+    when( ()=>sm.state === 'child2' && sm.getState('child2').props.a === 1 && sm.getState('child2').props.b === 2, done)
 
   });
 

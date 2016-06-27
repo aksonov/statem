@@ -9,6 +9,8 @@ var Mustache = require('mustache');
 var assert = require('assert');
 var transform = require('scxml/lib/compiler/scxml-to-scjson');
 var inc = 0;
+var reserved = ['success', 'failure', 'pop', 'onEntry', 'onExit', 'switch', 'push', 'clear', 'replace'];
+
 function toArray(m) {
   var res = [];
   Object.keys(m).forEach(function (id) {
@@ -36,7 +38,7 @@ root.id = '__Root';
 var states = [];
 var template = fs.readFileSync(templatePath, 'utf-8');
 if (process.argv.length > 4 && process.argv[4] === 'test') {
-  template = template.replace(/'statem'/g, "'../index'");
+  template = template.replace(/'statem'/g, "'../src/index'");
 }
 function wrapWithFunction(params, ret) {
   var args = params;
@@ -73,10 +75,13 @@ function convert(el) {
   res += '})\n';
   return res;
 }
+function toLower(id) {
+  return id.charAt(0).toLowerCase() + id.slice(1);
+}
 function generate(root, states, parent, parentProps) {
   var id = root.id;
   assert(id, "id is not defined for element:" + JSON.stringify(root));
-  var lid = id.charAt(0).toLowerCase() + id.slice(1);
+  var lid = toLower(id);
   if (root.onEntry) {
     root.onentry = wrapWithFunction(root.onEntry.map(convert), false);
     delete root.onEntry;
@@ -111,8 +116,23 @@ function generate(root, states, parent, parentProps) {
   Object.assign(allProps, vars);
   Object.assign(allProps, props);
 
+  var transitions = null;
+  var isSwitch = false;
   if (root.transitions) {
-    root.transitions.forEach(function (t) {
+    transitions = [];
+    root.transitions.forEach(function (el) {
+      if (el.event === 'push' || el.event === 'switch') {
+        var n = {};
+        if (el.event === 'switch') {
+          isSwitch = true;
+        }
+        Object.assign(n, el, { event: toLower(el.target), type: 'internal', mode: el.event, name: toLower(el.target) });
+        transitions.push(n);
+      } else if (el.event !== 'pop') {
+        transitions.push(el);
+      }
+    });
+    transitions.forEach(function (t) {
       if (t.onentry) {
         t.ontransition = wrapWithFunction(t.onentry.expr, false);
       }
@@ -120,14 +140,17 @@ function generate(root, states, parent, parentProps) {
         t.cond = wrapWithFunction(t.cond.expr, true);
       }
       t.name = t.event || 'default';
-      if (!exists[t.name] && t.name !== "success" && t.name !== "failure") {
+      if (!exists[t.name] && !reserved.find(function (el) {
+        return t.name === el;
+      })) {
         methods.push(t);
         exists[t.name] = true;
       }
     });
   }
-  var res = { parent: parent, vars: toArray(vars), props: toArray(props),
-    parentProps: toArray(parentProps), id: id, lid: lid, methods: methods, states: root.states, transitions: root.transitions };
+
+  var res = { parent: parent, vars: toArray(vars), props: toArray(props), isSwitch: isSwitch,
+    parentProps: toArray(parentProps), id: id, lid: lid, methods: methods, states: root.states, transitions: transitions };
   var params = [];
   Object.keys(root).forEach(function (key) {
     if (!res[key]) {

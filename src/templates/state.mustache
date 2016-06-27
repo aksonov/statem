@@ -38,6 +38,7 @@ import {action, computed, observable} from 'mobx';
         transition.push({
         {{# event}} event: "{{event}}", {{/event}}
         {{# type}} type: "{{type}}", {{/type}}
+        {{# mode}} mode: "{{mode}}", {{/mode}}
         {{# cond}} cond: {{& cond}}, {{/cond}}
         {{# target}} target:"{{ target }}", {{/target}}
         {{# ontransition}}onentry:{{& ontransition}}, {{/ ontransition}}
@@ -48,7 +49,13 @@ import {action, computed, observable} from 'mobx';
     this.transitions = transition.map(el => new Transition(this, el));
     {{# params }}this.{{key}} = {{& value}}; {{/params}}
 
-    sm.addState(this);
+    if (this.states && this.states.length){
+        for (let i=0;i<{{# isSwitch }}this.states.length {{/ isSwitch}}{{^ isSwitch }}1 {{/ isSwitch}};i++){
+            this.stack.push({name: this.states[i].id});
+        }
+
+        this.states.splice(0, 0, {id: this.id+'History', type:'deep', $type: 'history', transitions:[{target:this.states[0].id}]});
+    }
 
     }
     {{#methods}}
