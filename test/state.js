@@ -16,7 +16,7 @@ describe("test", function() {
   it("should create compoud state", function(){
     const sm = new StateMachine({id:'one', initial:'child', state:{id:'child'}});
     sm.start();
-    expect(sm.state).to.be.equal('child');
+    expect(sm.getState('child').active).to.be.true;
   });
 
   it("should create compoud state and call onentry", function(done){
@@ -39,18 +39,18 @@ describe("test", function() {
     const sm = new StateMachine({id:'one', initial:'child1',
       state:[{id:'child1', transition:{event:'go', target:'child2'}}, {id:'child2'}]});
     sm.start();
-    expect(sm.state).to.be.equal('child1');
+    expect(sm.getState('child1').active).to.be.true;
     sm.handle('go');
-    when( ()=>sm.state === 'child2', done)
+    when( ()=>sm.getState('child2').active, done)
   });
   //
   it("should create compoud state and two sub-states and handle transition", function(done){
     const sm = new StateMachine({id:'one', initial:'child1',
       state:[{id:'child1',transition:{event:'go', target:'child2'}}, {id:'child2'}],});
     sm.start();
-    expect(sm.state).to.be.equal('child1');
+    expect(sm.getState('child1').active).to.be.true;
     sm.handle('go', {a:1, b:2});
-    when( ()=>sm.state === 'child2' && sm.getState('child2').props.a === 1 && sm.getState('child2').props.b === 2, done)
+    when( ()=>sm.getState('child2').active && sm.getState('child2').props.a === 1 && sm.getState('child2').props.b === 2, done)
 
   });
 
@@ -60,10 +60,10 @@ describe("test", function() {
       state:[{id:'child1',transition:{event:'go', target:'child2'}},
         {id:'child2', transition:{target:'child1'}}]});
     sm.start();
-    expect(sm.state).to.be.equal('child1');
+    expect(sm.getState('child1').active).to.be.true;
     sm.handle('go', {a:1, b:2});
-
-    expect(sm.state).to.be.equal('child1');
+  
+    expect(sm.getState('child1').active).to.be.true;
 
   });
 });

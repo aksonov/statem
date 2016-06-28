@@ -11,15 +11,15 @@ function toLower(id){
 
 export default class State {
   id;
-  props = {};
+  @observable props = {};
   @observable stack = [];
   @observable index = 0;
+  @observable active: boolean = false;
   states;
   transitions;
   sm;
   parent;
   $type;
-  handlers = {};
   
   constructor(data, parent, sm){
     assert(data, "No state data is defined!");
@@ -61,24 +61,24 @@ export default class State {
   }
 
   onEntry = (_event) => {
-//    console.log(`ENTERING STATE: ${this.id} EVENT:${JSON.stringify(_event)} `);
+   //console.log(`ENTERING STATE: ${this.id} EVENT:${JSON.stringify(_event)} `);
     // assign all values to the state
+    this.active = true;
     if (_event && _event.data){
       this.props = _event.data;
     }
     if (this.onentry){
       this.onentry(_event);
     }
-    this.sm.enterState(this.id);
   };
-
+  
   onExit = (_event) => {
     this.props = null;
+    this.active = false;
     this.clear();
     if (this.onexit){
       this.onexit(_event);
     }
-    this.sm.exitState(this.id);
   };
 
   

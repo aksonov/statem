@@ -29,18 +29,6 @@ export default class StateMachine {
 
   }
   
-  enterState = (state) => {
-    this.state = state;if (!this.states.find(el=>el === state)) this.states.push(state);;
-  }
-  
-  exitState = (state) => {
-    this.states.replace(this.states.filter(el=>el !== state))
-  } 
-  
-  isIn = (state) => {
-    return this.states.find(el=>el === state);
-  }
-
   start = () => {
     this.interpreter.start();
   };
@@ -51,9 +39,9 @@ export default class StateMachine {
   };
 
   promise = ({wrap, content, $column, $line})=> {
-    var res;
-    var key;
-    var error;
+    let res;
+    let key;
+    let error;
     if (wrap){
       key = 'response';
     }
