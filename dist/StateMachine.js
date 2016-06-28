@@ -200,24 +200,6 @@ var StateMachine = (0, _autobindDecorator2.default)(_class = (_class2 = (_temp =
 
   this.handlers = {};
 
-  this.enterState = function (state) {
-    _this2.state = state;if (!_this2.states.find(function (el) {
-      return el === state;
-    })) _this2.states.push(state);;
-  };
-
-  this.exitState = function (state) {
-    _this2.states.replace(_this2.states.filter(function (el) {
-      return el !== state;
-    }));
-  };
-
-  this.isIn = function (state) {
-    return _this2.states.find(function (el) {
-      return el === state;
-    });
-  };
-
   this.start = function () {
     _this2.interpreter.start();
   };
@@ -235,9 +217,9 @@ var StateMachine = (0, _autobindDecorator2.default)(_class = (_class2 = (_temp =
     var $column = _ref5.$column;
     var $line = _ref5.$line;
 
-    var res;
-    var key;
-    var error;
+    var res = void 0;
+    var key = void 0;
+    var error = void 0;
     if (wrap) {
       key = 'response';
     }

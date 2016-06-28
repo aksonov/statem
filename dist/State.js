@@ -5,7 +5,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.default = undefined;
 
-var _desc, _value, _class, _descriptor, _descriptor2, _class2, _temp, _initialiseProps; // Copyright (c) 2016, Pavlo Aksonov
+var _desc, _value, _class, _descriptor, _descriptor2, _descriptor3, _descriptor4, _class2, _temp, _initialiseProps; // Copyright (c) 2016, Pavlo Aksonov
 // All rights reserved.
 
 var _mobx = require('mobx');
@@ -134,33 +134,33 @@ var State = (_class = (_temp = _class2 = function State(data, parent, sm) {
 , _initialiseProps = function _initialiseProps() {
   var _this2 = this;
 
-  this.props = {};
+  _initDefineProp(this, 'props', _descriptor, this);
 
-  _initDefineProp(this, 'stack', _descriptor, this);
+  _initDefineProp(this, 'stack', _descriptor2, this);
 
-  _initDefineProp(this, 'index', _descriptor2, this);
+  _initDefineProp(this, 'index', _descriptor3, this);
 
-  this.handlers = {};
+  _initDefineProp(this, 'active', _descriptor4, this);
 
   this.onEntry = function (_event) {
-    //    console.log(`ENTERING STATE: ${this.id} EVENT:${JSON.stringify(_event)} `);
+    //console.log(`ENTERING STATE: ${this.id} EVENT:${JSON.stringify(_event)} `);
     // assign all values to the state
+    _this2.active = true;
     if (_event && _event.data) {
       _this2.props = _event.data;
     }
     if (_this2.onentry) {
       _this2.onentry(_event);
     }
-    _this2.sm.enterState(_this2.id);
   };
 
   this.onExit = function (_event) {
     _this2.props = null;
+    _this2.active = false;
     _this2.clear();
     if (_this2.onexit) {
       _this2.onexit(_event);
     }
-    _this2.sm.exitState(_this2.id);
   };
 
   this.success = function (data) {
@@ -204,15 +204,25 @@ var State = (_class = (_temp = _class2 = function State(data, parent, sm) {
     var data = _this2.stack[_this2.stack.length - 1];
     _this2.sm.handle(toLower(data.name), data.data);
   };
-}, _temp), (_descriptor = _applyDecoratedDescriptor(_class.prototype, 'stack', [_mobx.observable], {
+}, _temp), (_descriptor = _applyDecoratedDescriptor(_class.prototype, 'props', [_mobx.observable], {
+  enumerable: true,
+  initializer: function initializer() {
+    return {};
+  }
+}), _descriptor2 = _applyDecoratedDescriptor(_class.prototype, 'stack', [_mobx.observable], {
   enumerable: true,
   initializer: function initializer() {
     return [];
   }
-}), _descriptor2 = _applyDecoratedDescriptor(_class.prototype, 'index', [_mobx.observable], {
+}), _descriptor3 = _applyDecoratedDescriptor(_class.prototype, 'index', [_mobx.observable], {
   enumerable: true,
   initializer: function initializer() {
     return 0;
+  }
+}), _descriptor4 = _applyDecoratedDescriptor(_class.prototype, 'active', [_mobx.observable], {
+  enumerable: true,
+  initializer: function initializer() {
+    return false;
   }
 })), _class);
 exports.default = State;
