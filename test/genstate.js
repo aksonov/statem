@@ -511,7 +511,7 @@ content: () => {return xmpp.login(_event.data.a)},
         transition.push({
          event: "homeScene", 
          type: "internal", 
-         mode: "switch", 
+         mode: "jump", 
         
          target:"HomeScene", 
         
@@ -519,7 +519,7 @@ content: () => {return xmpp.login(_event.data.a)},
         transition.push({
          event: "friendsScene", 
          type: "internal", 
-         mode: "switch", 
+         mode: "jump", 
         
          target:"FriendsScene", 
         

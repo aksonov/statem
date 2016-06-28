@@ -47,8 +47,8 @@
   </state>
   <state id="LoggedScene"><!--   node-size-and-position x=20 y=668 w=602.5 h=264  -->
    <state id="DrawerTabs"><!--  node-size-and-position x=20 y=43 w=548.5 h=201  -->
-    <transition event="switch" target="HomeScene"></transition>
-    <transition event="switch" target="FriendsScene"><!--   edge-path [FriendsScene]  pointx=0 pointy=0 offsetx=-8 offsety=0  --></transition>
+    <transition event="jump" target="HomeScene"></transition>
+    <transition event="jump" target="FriendsScene"><!--   edge-path [FriendsScene]  pointx=0 pointy=0 offsetx=-8 offsety=0  --></transition>
     <transition  event="pop"><!--   edge-path [DrawerTabs]  pointx=0 pointy=0 offsetx=-18 offsety=0  --></transition>
     <state id="HomeScene"/><!--   node-size-and-position x=20 y=43 w=75 h=75  -->
     <state id="FriendsScene">

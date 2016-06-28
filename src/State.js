@@ -97,11 +97,11 @@ export default class State {
     this.index = this.stack.length - 1;
   };
   
-  switch = (data) => {
+  jump = (data) => {
     assert(data, "Empty data");
     assert(data.name, "Empty state name");
     const i = this.stack.findIndex(el => el.name === data.name);
-    assert(i >= 0, "Cannot switch to non-existing state:"+ data.name+" STACK:"+JSON.stringify(this.stack));
+    assert(i >= 0, "Cannot jump to non-existing state:"+ data.name+" STACK:"+JSON.stringify(this.stack));
     this.index = i;
   };
   

@@ -23,9 +23,9 @@ export default class Transition {
         assert(data.target, "Target should be defined for push transition");
         parent.push({name: data.target, data:params && params.data || {}});
       }
-      if (this.mode === 'switch'){
+      if (this.mode === 'jump'){
         assert(data.target, "Target should be defined for push transition");
-        parent.switch({name: data.target, data:params && params.data || {}});
+        parent.jump({name: data.target, data:params && params.data || {}});
       }
     }
     

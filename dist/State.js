@@ -178,13 +178,13 @@ var State = (_class = (_temp = _class2 = function State(data, parent, sm) {
     _this2.index = _this2.stack.length - 1;
   };
 
-  this.switch = function (data) {
+  this.jump = function (data) {
     (0, _assert2.default)(data, "Empty data");
     (0, _assert2.default)(data.name, "Empty state name");
     var i = _this2.stack.findIndex(function (el) {
       return el.name === data.name;
     });
-    (0, _assert2.default)(i >= 0, "Cannot switch to non-existing state:" + data.name + " STACK:" + JSON.stringify(_this2.stack));
+    (0, _assert2.default)(i >= 0, "Cannot jump to non-existing state:" + data.name + " STACK:" + JSON.stringify(_this2.stack));
     _this2.index = i;
   };
 

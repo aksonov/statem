@@ -5,7 +5,7 @@ var Mustache = require('mustache');
 var assert = require('assert');
 var transform = require('scxml/lib/compiler/scxml-to-scjson');
 var inc=0;
-var reserved = ['success', 'failure', 'pop', 'onEntry', 'onExit', 'switch', 'push', 'clear', 'replace'];
+var reserved = ['success', 'failure', 'pop', 'onEntry', 'onExit', 'jump', 'push', 'clear', 'replace'];
 
 function toArray(m){
   var res = [];
@@ -117,9 +117,9 @@ function generate(root, states, parent, parentProps){
   if (root.transitions) {
     transitions = [];
     root.transitions.forEach(el => {
-      if (el.event === 'push' || el.event === 'switch') {
+      if (el.event === 'push' || el.event === 'jump') {
         var n = {};
-        if (el.event === 'switch'){
+        if (el.event === 'jump'){
           isSwitch = true;
         }
         Object.assign(n, el, {event: toLower(el.target), type: 'internal', mode: el.event, name: toLower(el.target)});

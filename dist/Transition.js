@@ -33,9 +33,9 @@ var Transition = function Transition(parent, data) {
       (0, _assert2.default)(data.target, "Target should be defined for push transition");
       parent.push({ name: data.target, data: params && params.data || {} });
     }
-    if (_this.mode === 'switch') {
+    if (_this.mode === 'jump') {
       (0, _assert2.default)(data.target, "Target should be defined for push transition");
-      parent.switch({ name: data.target, data: params && params.data || {} });
+      parent.jump({ name: data.target, data: params && params.data || {} });
     }
   };
 };
