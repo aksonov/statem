@@ -73,7 +73,7 @@ export default class State {
   };
   
   onExit = (_event) => {
-    this.props = null;
+    this.props = {};
     this.active = false;
     this.clear();
     if (this.onexit){

@@ -155,7 +155,7 @@ var State = (_class = (_temp = _class2 = function State(data, parent, sm) {
   };
 
   this.onExit = function (_event) {
-    _this2.props = null;
+    _this2.props = {};
     _this2.active = false;
     _this2.clear();
     if (_this2.onexit) {
