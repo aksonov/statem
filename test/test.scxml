@@ -11,7 +11,7 @@
  <state id="Root" initial="Load_Data"><!--   node-size-and-position x=20 y=293 w=797.03 h=1077  -->
   <state id="Load_Data"><!--   node-size-and-position x=369.75 y=43 w=75 h=75  -->
    <onentry>
-    <promise>storage.load()</promise>
+    <promise >storage.load()</promise>
    </onentry>
    <transition cond="_event.data &amp;&amp;_event.data.a" event="success" target="Connect"><!--   edge-path [Connect]  x=441.25 y=205.5 x=471.25 y=330.5  --></transition>
    <transition cond="!_event.data || !_event.data.a" event="success" target="PromoScene"><!--   edge-path [PromoScene]  x=407.18 y=145.52  --></transition>

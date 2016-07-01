@@ -78,7 +78,8 @@ function _initializerWarningHelper(descriptor, context) {
 }
 
 var StateMachine = (0, _autobindDecorator2.default)(_class = (_class2 = (_temp = _class3 = function () {
-  function StateMachine(state, stateClass) {
+  function StateMachine(state) {
+    var stateClasses = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
     var props = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
 
     _classCallCheck(this, StateMachine);
@@ -86,7 +87,8 @@ var StateMachine = (0, _autobindDecorator2.default)(_class = (_class2 = (_temp =
     _initialiseProps.call(this);
 
     Object.assign(this, props);
-    var StateClass = stateClass || _State2.default;
+    this.stateClasses = stateClasses;
+    var StateClass = stateClasses.State || _State2.default;
     var data = new StateClass(state, null, this);
     this.interpreter = new _scionCore2.default.Statechart(data, { console: console });
     this.interpreter._evaluateAction = function (currentEvent, actionRef) {
@@ -199,6 +201,7 @@ var StateMachine = (0, _autobindDecorator2.default)(_class = (_class2 = (_temp =
   _initDefineProp(this, 'states', _descriptor2, this);
 
   this.handlers = {};
+  this.stateClasses = {};
 
   this.start = function () {
     _this2.interpreter.start();

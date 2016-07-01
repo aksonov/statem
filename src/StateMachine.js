@@ -14,10 +14,12 @@ export default class StateMachine {
   @observable state;
   @observable states = [];
   handlers = {};
+  stateClasses = {};
 
-  constructor(state, stateClass, props = {}){
+  constructor(state, stateClasses = {}, props = {}){
     Object.assign(this, props);
-    const StateClass = stateClass || State;
+    this.stateClasses = stateClasses;
+    const StateClass = stateClasses.State || State;
     const data = new StateClass(state, null, this);
     this.interpreter = new scion.Statechart(data, {console});
     this.interpreter._evaluateAction = function(currentEvent, actionRef) {

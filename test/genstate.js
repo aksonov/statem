@@ -16,9 +16,9 @@ import {action, computed, observable} from 'mobx';
         this.user = user;
 
     let states = [];
-        states.push(new HistoryState(null, this, sm));
-        states.push(new RootState(null, this, sm));
-        states.push(new ErrorState(null, this, sm));
+        states.push(new (sm.stateClasses.History || HistoryState)(null, this, sm));
+        states.push(new (sm.stateClasses.Root || RootState)(null, this, sm));
+        states.push(new (sm.stateClasses.Error || ErrorState)(null, this, sm));
     let transition = [];
         transition.push({
          event: "error", 
@@ -34,11 +34,11 @@ import {action, computed, observable} from 'mobx';
     this.initial = 'History'; this.name = 'success'; this.$type = 'scxml'; 
 
     if (this.states && this.states.length){
-        for (let i=0;i<1 ;i++){
+    for (let i=0;i<1 ;i++){
             this.stack.push({name: this.states[i].id});
-        }
+            }
 
-        this.states.splice(0, 0, {id: this.id+'History', type:'deep', $type: 'history', transitions:[{target:this.states[0].id}]});
+            this.states.splice(0, 0, {id: this.id+'History', type:'deep', $type: 'history', transitions:[{target:this.states[0].id}]});
     }
 
     }
@@ -76,11 +76,11 @@ import {action, computed, observable} from 'mobx';
     this.type = 'deep'; this.isDeep = true; this.$type = 'history'; 
 
     if (this.states && this.states.length){
-        for (let i=0;i<1 ;i++){
+    for (let i=0;i<1 ;i++){
             this.stack.push({name: this.states[i].id});
-        }
+            }
 
-        this.states.splice(0, 0, {id: this.id+'History', type:'deep', $type: 'history', transitions:[{target:this.states[0].id}]});
+            this.states.splice(0, 0, {id: this.id+'History', type:'deep', $type: 'history', transitions:[{target:this.states[0].id}]});
     }
 
     }
@@ -103,14 +103,14 @@ import {action, computed, observable} from 'mobx';
         const user = this.user;
 
     let states = [];
-        states.push(new Load_DataState(null, this, sm));
-        states.push(new ConnectState(null, this, sm));
-        states.push(new PromoSceneState(null, this, sm));
-        states.push(new RegisterState(null, this, sm));
-        states.push(new Load_ProfileState(null, this, sm));
-        states.push(new SignUpSceneState(null, this, sm));
-        states.push(new Register_ProfileState(null, this, sm));
-        states.push(new LoggedSceneState(null, this, sm));
+        states.push(new (sm.stateClasses.Load_Data || Load_DataState)(null, this, sm));
+        states.push(new (sm.stateClasses.Connect || ConnectState)(null, this, sm));
+        states.push(new (sm.stateClasses.PromoScene || PromoSceneState)(null, this, sm));
+        states.push(new (sm.stateClasses.Register || RegisterState)(null, this, sm));
+        states.push(new (sm.stateClasses.Load_Profile || Load_ProfileState)(null, this, sm));
+        states.push(new (sm.stateClasses.SignUpScene || SignUpSceneState)(null, this, sm));
+        states.push(new (sm.stateClasses.Register_Profile || Register_ProfileState)(null, this, sm));
+        states.push(new (sm.stateClasses.LoggedScene || LoggedSceneState)(null, this, sm));
     let transition = [];
 
     this.states = states;
@@ -118,11 +118,11 @@ import {action, computed, observable} from 'mobx';
     this.initial = 'Load_Data'; 
 
     if (this.states && this.states.length){
-        for (let i=0;i<1 ;i++){
+    for (let i=0;i<1 ;i++){
             this.stack.push({name: this.states[i].id});
-        }
+            }
 
-        this.states.splice(0, 0, {id: this.id+'History', type:'deep', $type: 'history', transitions:[{target:this.states[0].id}]});
+            this.states.splice(0, 0, {id: this.id+'History', type:'deep', $type: 'history', transitions:[{target:this.states[0].id}]});
     }
 
     }
@@ -171,18 +171,18 @@ import {action, computed, observable} from 'mobx';
     this.states = states;
     this.transitions = transition.map(el => new Transition(this, el));
     this.onentry = _event => { this.sm.promise({$line: '13',
-$column: '13',
+$column: '14',
 $type: 'promise',
 content: () => {return storage.load()}, 
 })
 ; }; 
 
     if (this.states && this.states.length){
-        for (let i=0;i<1 ;i++){
+    for (let i=0;i<1 ;i++){
             this.stack.push({name: this.states[i].id});
-        }
+            }
 
-        this.states.splice(0, 0, {id: this.id+'History', type:'deep', $type: 'history', transitions:[{target:this.states[0].id}]});
+            this.states.splice(0, 0, {id: this.id+'History', type:'deep', $type: 'history', transitions:[{target:this.states[0].id}]});
     }
 
     }
@@ -230,11 +230,11 @@ content: () => {return xmpp.login(_event.data.a)},
 ; }; 
 
     if (this.states && this.states.length){
-        for (let i=0;i<1 ;i++){
+    for (let i=0;i<1 ;i++){
             this.stack.push({name: this.states[i].id});
-        }
+            }
 
-        this.states.splice(0, 0, {id: this.id+'History', type:'deep', $type: 'history', transitions:[{target:this.states[0].id}]});
+            this.states.splice(0, 0, {id: this.id+'History', type:'deep', $type: 'history', transitions:[{target:this.states[0].id}]});
     }
 
     }
@@ -269,11 +269,11 @@ content: () => {return xmpp.login(_event.data.a)},
     this.onentry = _event => { this.user.c = _event.data; }; 
 
     if (this.states && this.states.length){
-        for (let i=0;i<1 ;i++){
+    for (let i=0;i<1 ;i++){
             this.stack.push({name: this.states[i].id});
-        }
+            }
 
-        this.states.splice(0, 0, {id: this.id+'History', type:'deep', $type: 'history', transitions:[{target:this.states[0].id}]});
+            this.states.splice(0, 0, {id: this.id+'History', type:'deep', $type: 'history', transitions:[{target:this.states[0].id}]});
     }
 
     }
@@ -308,11 +308,11 @@ content: () => {return xmpp.login(_event.data.a)},
     
 
     if (this.states && this.states.length){
-        for (let i=0;i<1 ;i++){
+    for (let i=0;i<1 ;i++){
             this.stack.push({name: this.states[i].id});
-        }
+            }
 
-        this.states.splice(0, 0, {id: this.id+'History', type:'deep', $type: 'history', transitions:[{target:this.states[0].id}]});
+            this.states.splice(0, 0, {id: this.id+'History', type:'deep', $type: 'history', transitions:[{target:this.states[0].id}]});
     }
 
     }
@@ -363,11 +363,11 @@ content: () => {return xmpp.login(_event.data.a)},
     
 
     if (this.states && this.states.length){
-        for (let i=0;i<1 ;i++){
+    for (let i=0;i<1 ;i++){
             this.stack.push({name: this.states[i].id});
-        }
+            }
 
-        this.states.splice(0, 0, {id: this.id+'History', type:'deep', $type: 'history', transitions:[{target:this.states[0].id}]});
+            this.states.splice(0, 0, {id: this.id+'History', type:'deep', $type: 'history', transitions:[{target:this.states[0].id}]});
     }
 
     }
@@ -402,11 +402,11 @@ content: () => {return xmpp.login(_event.data.a)},
     
 
     if (this.states && this.states.length){
-        for (let i=0;i<1 ;i++){
+    for (let i=0;i<1 ;i++){
             this.stack.push({name: this.states[i].id});
-        }
+            }
 
-        this.states.splice(0, 0, {id: this.id+'History', type:'deep', $type: 'history', transitions:[{target:this.states[0].id}]});
+            this.states.splice(0, 0, {id: this.id+'History', type:'deep', $type: 'history', transitions:[{target:this.states[0].id}]});
     }
 
     }
@@ -449,11 +449,11 @@ content: () => {return xmpp.login(_event.data.a)},
     
 
     if (this.states && this.states.length){
-        for (let i=0;i<1 ;i++){
+    for (let i=0;i<1 ;i++){
             this.stack.push({name: this.states[i].id});
-        }
+            }
 
-        this.states.splice(0, 0, {id: this.id+'History', type:'deep', $type: 'history', transitions:[{target:this.states[0].id}]});
+            this.states.splice(0, 0, {id: this.id+'History', type:'deep', $type: 'history', transitions:[{target:this.states[0].id}]});
     }
 
     }
@@ -473,7 +473,7 @@ content: () => {return xmpp.login(_event.data.a)},
         const user = this.user;
 
     let states = [];
-        states.push(new DrawerTabsState(null, this, sm));
+        states.push(new (sm.stateClasses.DrawerTabs || DrawerTabsState)(null, this, sm));
     let transition = [];
 
     this.states = states;
@@ -481,11 +481,11 @@ content: () => {return xmpp.login(_event.data.a)},
     
 
     if (this.states && this.states.length){
-        for (let i=0;i<1 ;i++){
+    for (let i=0;i<1 ;i++){
             this.stack.push({name: this.states[i].id});
-        }
+            }
 
-        this.states.splice(0, 0, {id: this.id+'History', type:'deep', $type: 'history', transitions:[{target:this.states[0].id}]});
+            this.states.splice(0, 0, {id: this.id+'History', type:'deep', $type: 'history', transitions:[{target:this.states[0].id}]});
     }
 
     }
@@ -505,8 +505,8 @@ content: () => {return xmpp.login(_event.data.a)},
         const user = this.user;
 
     let states = [];
-        states.push(new HomeSceneState(null, this, sm));
-        states.push(new FriendsSceneState(null, this, sm));
+        states.push(new (sm.stateClasses.HomeScene || HomeSceneState)(null, this, sm));
+        states.push(new (sm.stateClasses.FriendsScene || FriendsSceneState)(null, this, sm));
     let transition = [];
         transition.push({
          event: "homeScene", 
@@ -530,11 +530,11 @@ content: () => {return xmpp.login(_event.data.a)},
     
 
     if (this.states && this.states.length){
-        for (let i=0;i<this.states.length ;i++){
+    for (let i=0;i<this.states.length ;i++){
             this.stack.push({name: this.states[i].id});
-        }
+            }
 
-        this.states.splice(0, 0, {id: this.id+'History', type:'deep', $type: 'history', transitions:[{target:this.states[0].id}]});
+            this.states.splice(0, 0, {id: this.id+'History', type:'deep', $type: 'history', transitions:[{target:this.states[0].id}]});
     }
 
     }
@@ -567,11 +567,11 @@ content: () => {return xmpp.login(_event.data.a)},
     
 
     if (this.states && this.states.length){
-        for (let i=0;i<1 ;i++){
+    for (let i=0;i<1 ;i++){
             this.stack.push({name: this.states[i].id});
-        }
+            }
 
-        this.states.splice(0, 0, {id: this.id+'History', type:'deep', $type: 'history', transitions:[{target:this.states[0].id}]});
+            this.states.splice(0, 0, {id: this.id+'History', type:'deep', $type: 'history', transitions:[{target:this.states[0].id}]});
     }
 
     }
@@ -591,8 +591,8 @@ content: () => {return xmpp.login(_event.data.a)},
         const user = this.user;
 
     let states = [];
-        states.push(new SearchFriendsState(null, this, sm));
-        states.push(new AddFriendByUsernameState(null, this, sm));
+        states.push(new (sm.stateClasses.SearchFriends || SearchFriendsState)(null, this, sm));
+        states.push(new (sm.stateClasses.AddFriendByUsername || AddFriendByUsernameState)(null, this, sm));
     let transition = [];
         transition.push({
          event: "searchFriends", 
@@ -616,11 +616,11 @@ content: () => {return xmpp.login(_event.data.a)},
     
 
     if (this.states && this.states.length){
-        for (let i=0;i<1 ;i++){
+    for (let i=0;i<1 ;i++){
             this.stack.push({name: this.states[i].id});
-        }
+            }
 
-        this.states.splice(0, 0, {id: this.id+'History', type:'deep', $type: 'history', transitions:[{target:this.states[0].id}]});
+            this.states.splice(0, 0, {id: this.id+'History', type:'deep', $type: 'history', transitions:[{target:this.states[0].id}]});
     }
 
     }
@@ -653,11 +653,11 @@ content: () => {return xmpp.login(_event.data.a)},
     
 
     if (this.states && this.states.length){
-        for (let i=0;i<1 ;i++){
+    for (let i=0;i<1 ;i++){
             this.stack.push({name: this.states[i].id});
-        }
+            }
 
-        this.states.splice(0, 0, {id: this.id+'History', type:'deep', $type: 'history', transitions:[{target:this.states[0].id}]});
+            this.states.splice(0, 0, {id: this.id+'History', type:'deep', $type: 'history', transitions:[{target:this.states[0].id}]});
     }
 
     }
@@ -684,11 +684,11 @@ content: () => {return xmpp.login(_event.data.a)},
     
 
     if (this.states && this.states.length){
-        for (let i=0;i<1 ;i++){
+    for (let i=0;i<1 ;i++){
             this.stack.push({name: this.states[i].id});
-        }
+            }
 
-        this.states.splice(0, 0, {id: this.id+'History', type:'deep', $type: 'history', transitions:[{target:this.states[0].id}]});
+            this.states.splice(0, 0, {id: this.id+'History', type:'deep', $type: 'history', transitions:[{target:this.states[0].id}]});
     }
 
     }
@@ -723,11 +723,11 @@ content: () => {return xmpp.login(_event.data.a)},
     
 
     if (this.states && this.states.length){
-        for (let i=0;i<1 ;i++){
+    for (let i=0;i<1 ;i++){
             this.stack.push({name: this.states[i].id});
-        }
+            }
 
-        this.states.splice(0, 0, {id: this.id+'History', type:'deep', $type: 'history', transitions:[{target:this.states[0].id}]});
+            this.states.splice(0, 0, {id: this.id+'History', type:'deep', $type: 'history', transitions:[{target:this.states[0].id}]});
     }
 
     }
@@ -756,6 +756,6 @@ export class Statem extends StateMachine {
     error: ErrorState = this.getState("Error");
 }
 
-export default function createStateMachine(props) {
-  return new Statem(null, __RootState, props);
+export default function createStateMachine(props, stateClasses = {}) {
+return new Statem(null, {State:__RootState, ...stateClasses}, props);
 }
