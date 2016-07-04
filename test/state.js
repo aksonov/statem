@@ -5,12 +5,12 @@ import StateMachine from '../src/StateMachine';
 
 describe("test", function() {
   it("throw error if no initial state", function(){
-    expect(()=>new StateMachine({id:'one', state:{id:'child'}})).to.throw('Initial state should be set for compoud state: one');
+    expect(()=>new StateMachine({id:'one', state:{id:'child'}}).start()).to.throw('Initial state should be set for compoud state: one');
   });
 
   it("throw error if no initial state", function(){
     expect(()=>new StateMachine({id:'one', initial:'child2',
-      state:{id:'child'}})).to.throw('No state child2 exist for compud state one');
+      state:{id:'child'}}).start()).to.throw('No state child2 exist for compud state one');
   });
 
   it("should create compoud state", function(){

@@ -31,7 +31,7 @@ import {action, computed, observable} from 'mobx';
 
     let states = [];
     {{#states}}
-        states.push(new (sm.stateClasses.{{id}} || {{id}}State)(null, this, sm));
+        states.push(new {{id}}State(null, this, sm));
     {{/states}}
     let transition = [];
     {{#transitions }}
@@ -68,10 +68,8 @@ import {action, computed, observable} from 'mobx';
 
 export class Statem extends StateMachine {
 {{#states}}
-    {{ lid }}: {{id}}State = this.getState("{{id}}");
+    get {{ lid }}(): {{id}}State {return this.getState("{{id}}")};
 {{/states}}
 }
 
-export default function createStateMachine(props, stateClasses = {}) {
-return new Statem(null, {State:__RootState, ...stateClasses}, props);
-}
+export default new Statem(null, __RootState);

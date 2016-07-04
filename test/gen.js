@@ -1,47 +1,50 @@
 import {when, action, autorun, observable, spy} from 'mobx';
 import {expect} from 'chai';
-import createSM from './genstate';
+import statem from './genstate';
+
+statem.listener = {onEntry:state=>console.log(`ENTER STATE:${state}`)};
+statem.xmpp = {login(a) { return a===1 ? {result:1} : false }};
+statem.storage = {load: function(){return {}}};
 
 describe("test", function() {
   it("redirect to promo scene", function(done){
-    const state = createSM({ storage: {load: ()=>{}}});
-    state.start();
-    expect(state.promoScene.active).to.be.false;
-    when (()=>state.promoScene.active, done);
+    statem.start();
+    expect(statem.promoScene.active).to.be.false;
+    when (()=>statem.promoScene.active, done);
   });
   it("expect login scene with history", function(done){
-    const state = createSM({ storage: {load: ()=>{}}});
-    state.start();
-    when(()=>state.load_Data.active, ()=>state.success());
-    when(()=>state.promoScene.active, ()=>state.handle("error"));
-    when(()=>state.error.active, ()=>{
-      state.error.handled();
-      when(()=>state.promoScene.active, done);
+    statem.start();
+    when(()=>statem.load_Data.active, ()=>statem.success());
+    when(()=>statem.promoScene.active, ()=>statem.handle("error"));
+    when(()=>statem.error.active, ()=>{
+      statem.error.handled();
+      when(()=>statem.promoScene.active, done);
     });
   });
   
   it("expect logged scene", function(done){
-    const state = createSM({ listener: {onEntry:state=>console.log(`ENTER STATE:${state}`)}, xmpp: {login(a) { return a===1}}, storage: {load: function(){return {a:1, b:2}}}});
-    state.start();
-    when(()=>state.load_Profile.active, ()=>{
-      state.success({handle:'test'});
+    statem.storage = {load: function(){return {a:1, b:2}}};
+    statem.start();
+    when(()=>statem.load_Profile.active, ()=>{
+      expect(statem.load_Profile.model.result).to.be.equal(1);
+      statem.success({handle:'test'});
     });
-    when (()=>state.homeScene.active, ()=> {
-      state.drawerTabs.friendsScene({msg: "hello"});
-    });
-    
-    when(()=>state.searchFriends.active, ()=> {
-      state.friendsScene.addFriendByUsername({user:'test'});
+    when (()=>statem.homeScene.active, ()=> {
+      statem.drawerTabs.friendsScene({msg: "hello"});
     });
     
-    when(()=>state.addFriendByUsername.active, ()=>{
-      expect(state.drawerTabs.stack.length).to.be.equal(2);
-      expect(state.friendsScene.stack.length).to.be.equal(2);
-      state.drawerTabs.homeScene();
+    when(()=>statem.searchFriends.active, ()=> {
+      statem.friendsScene.addFriendByUsername({user:'test'});
+    });
+    
+    when(()=>statem.addFriendByUsername.active, ()=>{
+      expect(statem.drawerTabs.stack.length).to.be.equal(2);
+      expect(statem.friendsScene.stack.length).to.be.equal(2);
+      statem.drawerTabs.homeScene();
       // switch back and verify that addFriendsByUsername is selected
-      when(()=>state.homeScene.active, ()=> {
-        state.drawerTabs.friendsScene();
-        when(()=>state.addFriendByUsername.active, done);
+      when(()=>statem.homeScene.active, ()=> {
+        statem.drawerTabs.friendsScene();
+        when(()=>statem.addFriendByUsername.active, done);
       });
     });
   

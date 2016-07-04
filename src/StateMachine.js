@@ -14,24 +14,27 @@ export default class StateMachine {
   @observable state;
   @observable states = [];
   handlers = {};
-  stateClasses = {};
-
-  constructor(state, stateClasses = {}, props = {}){
-    Object.assign(this, props);
-    this.stateClasses = stateClasses;
-    const StateClass = stateClasses.State || State;
-    const data = new StateClass(state, null, this);
-    this.interpreter = new scion.Statechart(data, {console});
-    this.interpreter._evaluateAction = function(currentEvent, actionRef) {
-        return actionRef.call(this._scriptingContext, currentEvent);     //SCXML system variables
-    };
-    if (props.listener){
-      this.interpreter.registerListener(props.listener);
-    }
-
+  initialState = null;
+  RootClass;
+  listener = null;
+  
+  constructor(initialState, RootClass){
+    this.initialState = initialState;
+    this.RootClass = RootClass;
   }
   
   start = () => {
+    const StateClass = this.RootClass || State;
+    this._states = {};
+    this.states.replace([]);
+    this.initialState  = new StateClass(this.initialState, null, this);
+    this.interpreter = new scion.Statechart(this.initialState, {console});
+    if (this.listener) {
+      this.interpreter.registerListener(this.listener);
+    }
+    this.interpreter._evaluateAction = function(currentEvent, actionRef) {
+      return actionRef.call(this._scriptingContext, currentEvent);     //SCXML system variables
+    };
     this.interpreter.start();
   };
 

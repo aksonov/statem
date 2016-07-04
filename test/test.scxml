@@ -1,8 +1,9 @@
 <scxml initial="History" name="success" version="1.0" xmlns="http://www.w3.org/2005/07/scxml"><!--   node-size-and-position x=0 y=0 w=837.03 h=1390  -->
- <datamodel>
+ <datamodel >
   <data expr="{a:1, b:2}" id="user"></data>
   <data expr="this.sm.storage" id="storage"></data>
   <data expr="this.sm.xmpp" id="xmpp"></data>
+  <data id="model" expr="{}"/>
  </datamodel>
  <transition event="error" target="Error"></transition>
  <history id="History" type="deep"><!--   node-size-and-position x=381.01 y=168 w=75 h=75  -->
@@ -22,7 +23,14 @@
     <promise>xmpp.login(_event.data.a)</promise>
    </onentry>
    <transition event="failure" target="PromoScene"><!--   edge-path [PromoScene]  x=441.25 y=330.5  --></transition>
-   <transition event="success" target="Load_Profile"></transition>
+   <transition event="success" target="StoreResult"></transition>
+  </state>
+  <state id="StoreResult">
+   <onentry>
+    <script>console.log('event data:', _event.data)</script>
+    <assign location="model" expr="_event.data"/>
+   </onentry>
+   <transition target="Load_Profile"/>
   </state>
   <state id="PromoScene"><!--   node-size-and-position x=335.75 y=168 w=75 h=75  -->
    <onentry>
