@@ -60,7 +60,7 @@ import {action, computed, observable} from 'mobx';
     }
     {{#methods}}
         {{ name }} = (data) => {
-        this.sm.handle("{{ name }}", data);
+        this.handle("{{ name }}", data);
         };
     {{/methods}}
     }

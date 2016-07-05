@@ -16,7 +16,7 @@ export default class StateMachine {
   handlers = {};
   initialState = null;
   RootClass;
-  listener = null;
+  listeners = [];
   
   constructor(initialState, RootClass){
     this.initialState = initialState;
@@ -29,9 +29,7 @@ export default class StateMachine {
     this.states.replace([]);
     this.initialState  = new StateClass(this.initialState, null, this);
     this.interpreter = new scion.Statechart(this.initialState, {console});
-    if (this.listener) {
-      this.interpreter.registerListener(this.listener);
-    }
+    this.listeners.forEach(listener => this.interpreter.registerListener(listener));
     this.interpreter._evaluateAction = function(currentEvent, actionRef) {
       return actionRef.call(this._scriptingContext, currentEvent);     //SCXML system variables
     };

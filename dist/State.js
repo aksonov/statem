@@ -5,7 +5,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.default = undefined;
 
-var _desc, _value, _class, _descriptor, _descriptor2, _descriptor3, _descriptor4, _class2, _temp, _initialiseProps; // Copyright (c) 2016, Pavlo Aksonov
+var _desc, _value, _class, _descriptor, _descriptor2, _descriptor3, _descriptor4, _descriptor5, _descriptor6, _descriptor7, _descriptor8, _class2, _temp, _initialiseProps; // Copyright (c) 2016, Pavlo Aksonov
 // All rights reserved.
 
 var _mobx = require('mobx');
@@ -129,9 +129,7 @@ var State = (_class = (_temp = _class2 = function State(data, parent, sm) {
 
   this.onentry = onentry;
   this.onexit = onexit;
-}
-//this.stack.replace(this.stack.slice(1));
-, _initialiseProps = function _initialiseProps() {
+}, _initialiseProps = function _initialiseProps() {
   var _this2 = this;
 
   _initDefineProp(this, 'props', _descriptor, this);
@@ -171,39 +169,24 @@ var State = (_class = (_temp = _class2 = function State(data, parent, sm) {
     _this2.sm.handle("failure", data);
   };
 
-  this.push = function (data) {
-    (0, _assert2.default)(data, "Empty data");
-    (0, _assert2.default)(data.name, "Empty state name");
-    _this2.stack.push(data);
-    _this2.index = _this2.stack.length - 1;
+  this.handle = function (name, data) {
+    if (!_this2.active && _this2.parent[toLower(_this2.id)]) {
+      _this2.parent[toLower(_this2.id)]();
+    }
+    _this2.sm.handle(name, data);
   };
 
-  this.jump = function (data) {
-    (0, _assert2.default)(data, "Empty data");
-    (0, _assert2.default)(data.name, "Empty state name");
-    var i = _this2.stack.findIndex(function (el) {
-      return el.name === data.name;
-    });
-    (0, _assert2.default)(i >= 0, "Cannot jump to non-existing state:" + data.name + " STACK:" + JSON.stringify(_this2.stack));
-    _this2.index = i;
+  _initDefineProp(this, 'push', _descriptor5, this);
+
+  _initDefineProp(this, 'jump', _descriptor6, this);
+
+  this.clear = function () {
+    //this.stack.replace(this.stack.slice(1));
   };
 
-  this.clear = function () {};
+  _initDefineProp(this, 'replace', _descriptor7, this);
 
-  this.replace = function (data) {
-    (0, _assert2.default)(_this2.stack.length, "Empty stack");
-    (0, _assert2.default)(data, "Empty data");
-    (0, _assert2.default)(data.name, "Empty state name");
-    _this2.stack[_this2.stack.length - 1] = data;
-  };
-
-  this.pop = function () {
-    (0, _assert2.default)(_this2.stack.length > 1, "Empty stack, cannot pop");
-    _this2.stack.pop();
-    _this2.index = _this2.stack.length - 1;
-    var data = _this2.stack[_this2.stack.length - 1];
-    _this2.sm.handle(toLower(data.name), data.data);
-  };
+  _initDefineProp(this, 'pop', _descriptor8, this);
 }, _temp), (_descriptor = _applyDecoratedDescriptor(_class.prototype, 'props', [_mobx.observable], {
   enumerable: true,
   initializer: function initializer() {
@@ -223,6 +206,58 @@ var State = (_class = (_temp = _class2 = function State(data, parent, sm) {
   enumerable: true,
   initializer: function initializer() {
     return false;
+  }
+}), _descriptor5 = _applyDecoratedDescriptor(_class.prototype, 'push', [_mobx.action], {
+  enumerable: true,
+  initializer: function initializer() {
+    var _this3 = this;
+
+    return function (data) {
+      (0, _assert2.default)(data, "Empty data");
+      (0, _assert2.default)(data.name, "Empty state name");
+      _this3.stack.push(data);
+      _this3.index = _this3.stack.length - 1;
+    };
+  }
+}), _descriptor6 = _applyDecoratedDescriptor(_class.prototype, 'jump', [_mobx.action], {
+  enumerable: true,
+  initializer: function initializer() {
+    var _this4 = this;
+
+    return function (data) {
+      (0, _assert2.default)(data, "Empty data");
+      (0, _assert2.default)(data.name, "Empty state name");
+      var i = _this4.stack.findIndex(function (el) {
+        return el.name === data.name;
+      });
+      (0, _assert2.default)(i >= 0, "Cannot jump to non-existing state:" + data.name + " STACK:" + JSON.stringify(_this4.stack));
+      _this4.index = i;
+    };
+  }
+}), _descriptor7 = _applyDecoratedDescriptor(_class.prototype, 'replace', [_mobx.action], {
+  enumerable: true,
+  initializer: function initializer() {
+    var _this5 = this;
+
+    return function (data) {
+      (0, _assert2.default)(_this5.stack.length, "Empty stack");
+      (0, _assert2.default)(data, "Empty data");
+      (0, _assert2.default)(data.name, "Empty state name");
+      _this5.stack[_this5.stack.length - 1] = data;
+    };
+  }
+}), _descriptor8 = _applyDecoratedDescriptor(_class.prototype, 'pop', [_mobx.action], {
+  enumerable: true,
+  initializer: function initializer() {
+    var _this6 = this;
+
+    return function () {
+      (0, _assert2.default)(_this6.stack.length > 1, "Empty stack, cannot pop");
+      _this6.stack.pop();
+      _this6.index = _this6.stack.length - 1;
+      var data = _this6.stack[_this6.stack.length - 1];
+      _this6.sm.handle(toLower(data.name), data.data);
+    };
   }
 })), _class);
 exports.default = State;

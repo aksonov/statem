@@ -90,14 +90,21 @@ export default class State {
     this.sm.handle("failure", data);
   };
   
-  push = (data) => {
+  handle = (name, data) => {
+    if (!this.active && this.parent[toLower(this.id)]){
+      this.parent[toLower(this.id)]();
+    }
+    this.sm.handle(name, data);
+  }
+  
+  @action push = (data) => {
     assert(data, "Empty data");
     assert(data.name, "Empty state name");
     this.stack.push(data);
     this.index = this.stack.length - 1;
   };
   
-  jump = (data) => {
+  @action jump = (data) => {
     assert(data, "Empty data");
     assert(data.name, "Empty state name");
     const i = this.stack.findIndex(el => el.name === data.name);
@@ -110,14 +117,14 @@ export default class State {
     //this.stack.replace(this.stack.slice(1));
   };
 
-  replace = (data) => {
+  @action replace = (data) => {
     assert(this.stack.length, "Empty stack");
     assert(data, "Empty data");
     assert(data.name, "Empty state name");
     this.stack[this.stack.length - 1] = data;
   };
   
-  pop = () => {
+  @action pop = () => {
     assert(this.stack.length > 1, "Empty stack, cannot pop");
     this.stack.pop();
     this.index = this.stack.length - 1;

@@ -91,7 +91,7 @@ var StateMachine = (0, _autobindDecorator2.default)(_class = (_class2 = function
 
     this.handlers = {};
     this.initialState = null;
-    this.listener = null;
+    this.listeners = [];
 
     this.start = function () {
       var StateClass = _this.RootClass || _State2.default;
@@ -99,9 +99,9 @@ var StateMachine = (0, _autobindDecorator2.default)(_class = (_class2 = function
       _this.states.replace([]);
       _this.initialState = new StateClass(_this.initialState, null, _this);
       _this.interpreter = new _scionCore2.default.Statechart(_this.initialState, { console: console });
-      if (_this.listener) {
-        _this.interpreter.registerListener(_this.listener);
-      }
+      _this.listeners.forEach(function (listener) {
+        return _this.interpreter.registerListener(listener);
+      });
       _this.interpreter._evaluateAction = function (currentEvent, actionRef) {
         return actionRef.call(this._scriptingContext, currentEvent); //SCXML system variables
       };
