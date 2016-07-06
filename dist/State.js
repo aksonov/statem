@@ -5,7 +5,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.default = undefined;
 
-var _desc, _value, _class, _descriptor, _descriptor2, _descriptor3, _descriptor4, _descriptor5, _descriptor6, _descriptor7, _descriptor8, _class2, _temp, _initialiseProps; // Copyright (c) 2016, Pavlo Aksonov
+var _desc, _value, _class, _descriptor, _descriptor2, _descriptor3, _descriptor4, _descriptor5, _descriptor6, _descriptor7, _descriptor8, _descriptor9, _descriptor10, _class2, _temp, _initialiseProps; // Copyright (c) 2016, Pavlo Aksonov
 // All rights reserved.
 
 var _mobx = require('mobx');
@@ -140,26 +140,13 @@ var State = (_class = (_temp = _class2 = function State(data, parent, sm) {
 
   _initDefineProp(this, 'active', _descriptor4, this);
 
-  this.onEntry = function (_event) {
-    //console.log(`ENTERING STATE: ${this.id} EVENT:${JSON.stringify(_event)} `);
-    // assign all values to the state
-    _this2.active = true;
-    if (_event && _event.data) {
-      _this2.props = _event.data;
-    }
-    if (_this2.onentry) {
-      _this2.onentry(_event);
-    }
-  };
+  this.onEntry = this.onEntryAction;
 
-  this.onExit = function (_event) {
-    _this2.props = {};
-    _this2.active = false;
-    _this2.clear();
-    if (_this2.onexit) {
-      _this2.onexit(_event);
-    }
-  };
+  _initDefineProp(this, 'onEntryAction', _descriptor5, this);
+
+  this.onExit = this.onExitAction;
+
+  _initDefineProp(this, 'onExitAction', _descriptor6, this);
 
   this.success = function (data) {
     _this2.sm.handle("success", data);
@@ -176,17 +163,17 @@ var State = (_class = (_temp = _class2 = function State(data, parent, sm) {
     _this2.sm.handle(name, data);
   };
 
-  _initDefineProp(this, 'push', _descriptor5, this);
+  _initDefineProp(this, 'push', _descriptor7, this);
 
-  _initDefineProp(this, 'jump', _descriptor6, this);
+  _initDefineProp(this, 'jump', _descriptor8, this);
 
   this.clear = function () {
     //this.stack.replace(this.stack.slice(1));
   };
 
-  _initDefineProp(this, 'replace', _descriptor7, this);
+  _initDefineProp(this, 'replace', _descriptor9, this);
 
-  _initDefineProp(this, 'pop', _descriptor8, this);
+  _initDefineProp(this, 'pop', _descriptor10, this);
 }, _temp), (_descriptor = _applyDecoratedDescriptor(_class.prototype, 'props', [_mobx.observable], {
   enumerable: true,
   initializer: function initializer() {
@@ -207,56 +194,85 @@ var State = (_class = (_temp = _class2 = function State(data, parent, sm) {
   initializer: function initializer() {
     return false;
   }
-}), _descriptor5 = _applyDecoratedDescriptor(_class.prototype, 'push', [_mobx.action], {
+}), _descriptor5 = _applyDecoratedDescriptor(_class.prototype, 'onEntryAction', [_mobx.action], {
   enumerable: true,
   initializer: function initializer() {
     var _this3 = this;
 
-    return function (data) {
-      (0, _assert2.default)(data, "Empty data");
-      (0, _assert2.default)(data.name, "Empty state name");
-      _this3.stack.push(data);
-      _this3.index = _this3.stack.length - 1;
+    return function (_event) {
+      _this3.active = true;
+      if (_event && _event.data) {
+        _this3.props = _event.data;
+      }
+      if (_this3.onentry) {
+        _this3.onentry(_event);
+      }
     };
   }
-}), _descriptor6 = _applyDecoratedDescriptor(_class.prototype, 'jump', [_mobx.action], {
+}), _descriptor6 = _applyDecoratedDescriptor(_class.prototype, 'onExitAction', [_mobx.action], {
   enumerable: true,
   initializer: function initializer() {
     var _this4 = this;
 
-    return function (data) {
-      (0, _assert2.default)(data, "Empty data");
-      (0, _assert2.default)(data.name, "Empty state name");
-      var i = _this4.stack.findIndex(function (el) {
-        return el.name === data.name;
-      });
-      (0, _assert2.default)(i >= 0, "Cannot jump to non-existing state:" + data.name + " STACK:" + JSON.stringify(_this4.stack));
-      _this4.index = i;
+    return function (_event) {
+      _this4.props = {};
+      _this4.active = false;
+      _this4.clear();
+      if (_this4.onexit) {
+        _this4.onexit(_event);
+      }
     };
   }
-}), _descriptor7 = _applyDecoratedDescriptor(_class.prototype, 'replace', [_mobx.action], {
+}), _descriptor7 = _applyDecoratedDescriptor(_class.prototype, 'push', [_mobx.action], {
   enumerable: true,
   initializer: function initializer() {
     var _this5 = this;
 
     return function (data) {
-      (0, _assert2.default)(_this5.stack.length, "Empty stack");
       (0, _assert2.default)(data, "Empty data");
       (0, _assert2.default)(data.name, "Empty state name");
-      _this5.stack[_this5.stack.length - 1] = data;
+      _this5.stack.push(data);
+      _this5.index = _this5.stack.length - 1;
     };
   }
-}), _descriptor8 = _applyDecoratedDescriptor(_class.prototype, 'pop', [_mobx.action], {
+}), _descriptor8 = _applyDecoratedDescriptor(_class.prototype, 'jump', [_mobx.action], {
   enumerable: true,
   initializer: function initializer() {
     var _this6 = this;
 
+    return function (data) {
+      (0, _assert2.default)(data, "Empty data");
+      (0, _assert2.default)(data.name, "Empty state name");
+      var i = _this6.stack.findIndex(function (el) {
+        return el.name === data.name;
+      });
+      (0, _assert2.default)(i >= 0, "Cannot jump to non-existing state:" + data.name + " STACK:" + JSON.stringify(_this6.stack));
+      _this6.index = i;
+    };
+  }
+}), _descriptor9 = _applyDecoratedDescriptor(_class.prototype, 'replace', [_mobx.action], {
+  enumerable: true,
+  initializer: function initializer() {
+    var _this7 = this;
+
+    return function (data) {
+      (0, _assert2.default)(_this7.stack.length, "Empty stack");
+      (0, _assert2.default)(data, "Empty data");
+      (0, _assert2.default)(data.name, "Empty state name");
+      _this7.stack[_this7.stack.length - 1] = data;
+    };
+  }
+}), _descriptor10 = _applyDecoratedDescriptor(_class.prototype, 'pop', [_mobx.action], {
+  enumerable: true,
+  initializer: function initializer() {
+    var _this8 = this;
+
     return function () {
-      (0, _assert2.default)(_this6.stack.length > 1, "Empty stack, cannot pop");
-      _this6.stack.pop();
-      _this6.index = _this6.stack.length - 1;
-      var data = _this6.stack[_this6.stack.length - 1];
-      _this6.sm.handle(toLower(data.name), data.data);
+      (0, _assert2.default)(_this8.stack.length > 1, "Empty stack, cannot pop");
+      _this8.stack.pop();
+      _this8.index = _this8.stack.length - 1;
+      var data = _this8.stack[_this8.stack.length - 1];
+      _this8.sm.handle(toLower(data.name), data.data);
     };
   }
 })), _class);

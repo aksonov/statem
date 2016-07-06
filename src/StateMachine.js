@@ -11,7 +11,6 @@ import {observable} from 'mobx';
 export default class StateMachine {
   interpreter;
   _states = {};
-  @observable state;
   @observable states = [];
   handlers = {};
   initialState = null;

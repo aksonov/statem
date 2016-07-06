@@ -60,9 +60,9 @@ export default class State {
     this.onexit = onexit;
   }
 
-  onEntry = (_event) => {
-   //console.log(`ENTERING STATE: ${this.id} EVENT:${JSON.stringify(_event)} `);
-    // assign all values to the state
+  onEntry = this.onEntryAction;
+  
+  @action onEntryAction = (_event) => {
     this.active = true;
     if (_event && _event.data){
       this.props = _event.data;
@@ -70,9 +70,11 @@ export default class State {
     if (this.onentry){
       this.onentry(_event);
     }
-  };
+  }
   
-  onExit = (_event) => {
+  onExit = this.onExitAction;
+  
+  @action onExitAction = (_event) => {
     this.props = {};
     this.active = false;
     this.clear();

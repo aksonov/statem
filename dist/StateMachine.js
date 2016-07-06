@@ -7,7 +7,7 @@ exports.default = undefined;
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _class, _desc, _value, _class2, _descriptor, _descriptor2; // Copyright (c) 2016, Pavlo Aksonov
+var _class, _desc, _value, _class2, _descriptor; // Copyright (c) 2016, Pavlo Aksonov
 // All rights reserved.
 
 var _scionCore = require('scion-core');
@@ -85,9 +85,7 @@ var StateMachine = (0, _autobindDecorator2.default)(_class = (_class2 = function
 
     this._states = {};
 
-    _initDefineProp(this, 'state', _descriptor, this);
-
-    _initDefineProp(this, 'states', _descriptor2, this);
+    _initDefineProp(this, 'states', _descriptor, this);
 
     this.handlers = {};
     this.initialState = null;
@@ -261,10 +259,7 @@ var StateMachine = (0, _autobindDecorator2.default)(_class = (_class2 = function
   }]);
 
   return StateMachine;
-}(), (_descriptor = _applyDecoratedDescriptor(_class2.prototype, 'state', [_mobx.observable], {
-  enumerable: true,
-  initializer: null
-}), _descriptor2 = _applyDecoratedDescriptor(_class2.prototype, 'states', [_mobx.observable], {
+}(), (_descriptor = _applyDecoratedDescriptor(_class2.prototype, 'states', [_mobx.observable], {
   enumerable: true,
   initializer: function initializer() {
     return [];
