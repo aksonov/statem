@@ -114,10 +114,12 @@ function generate(root, states, parent, parentProps){
   
   var transitions = null;
   var isSwitch = false;
+  var isContainer = false;
   if (root.transitions) {
     transitions = [];
     root.transitions.forEach(el => {
       if (el.event === 'push' || el.event === 'jump') {
+        isContainer = true;
         var n = {};
         if (el.event === 'jump'){
           isSwitch = true;
@@ -145,7 +147,7 @@ function generate(root, states, parent, parentProps){
   }
   
   var res = {parent, vars:toArray(vars), props:toArray(props), isSwitch,
-    parentProps:toArray(parentProps), id, lid, methods, states:root.states, transitions};
+    parentProps:toArray(parentProps), id, lid, isContainer, methods, states:root.states, transitions};
     var params = [];
   Object.keys(root).forEach(key=>{
     if (!res[key]){

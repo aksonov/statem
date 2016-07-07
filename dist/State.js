@@ -271,8 +271,8 @@ var State = (_class = (_temp = _class2 = function State(data, parent, sm) {
       (0, _assert2.default)(_this8.stack.length > 1, "Empty stack, cannot pop");
       _this8.stack.pop();
       _this8.index = _this8.stack.length - 1;
-      var data = _this8.stack[_this8.stack.length - 1];
-      _this8.sm.handle(toLower(data.name), data.data);
+      var data = _this8.stack[_this8.index];
+      _this8.sm.handle(toLower(data.name), { pop: true });
     };
   }
 })), _class);

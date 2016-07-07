@@ -50,11 +50,16 @@ import {action, computed, observable} from 'mobx';
     {{# params }}this.{{key}} = {{& value}}; {{/params}}
 
     if (this.states && this.states.length){
+        const initial = this.initial || this.states[0].id;
     for (let i=0;i<{{# isSwitch }}this.states.length {{/ isSwitch}}{{^ isSwitch }}1 {{/ isSwitch}};i++){
             this.stack.push({name: this.states[i].id});
             }
 
-            this.states.splice(0, 0, {id: this.id+'History', type:'deep', $type: 'history', transitions:[{target:this.states[0].id}]});
+            {{# isContainer }}
+                this.states.splice(0, 0, {id: this.id+'History', type:'deep', $type: 'history', transitions:[{target:initial}]});
+                this.initial = this.id+'History';
+            {{/isContainer}}
+
     }
 
     }

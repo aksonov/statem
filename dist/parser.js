@@ -118,10 +118,12 @@ function generate(root, states, parent, parentProps) {
 
   var transitions = null;
   var isSwitch = false;
+  var isContainer = false;
   if (root.transitions) {
     transitions = [];
     root.transitions.forEach(function (el) {
       if (el.event === 'push' || el.event === 'jump') {
+        isContainer = true;
         var n = {};
         if (el.event === 'jump') {
           isSwitch = true;
@@ -150,7 +152,7 @@ function generate(root, states, parent, parentProps) {
   }
 
   var res = { parent: parent, vars: toArray(vars), props: toArray(props), isSwitch: isSwitch,
-    parentProps: toArray(parentProps), id: id, lid: lid, methods: methods, states: root.states, transitions: transitions };
+    parentProps: toArray(parentProps), id: id, lid: lid, isContainer: isContainer, methods: methods, states: root.states, transitions: transitions };
   var params = [];
   Object.keys(root).forEach(function (key) {
     if (!res[key]) {
