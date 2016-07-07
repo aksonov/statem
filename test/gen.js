@@ -12,15 +12,15 @@ describe("test", function() {
     expect(statem.promoScene.active).to.be.false;
     when (()=>statem.promoScene.active, done);
   });
-  it("expect login scene with history", function(done){
-    statem.start();
-    when(()=>statem.load_Data.active, ()=>statem.success());
-    when(()=>statem.promoScene.active, ()=>statem.handle("error"));
-    when(()=>statem.error.active, ()=>{
-      statem.error.handled();
-      when(()=>statem.promoScene.active, done);
-    });
-  });
+  // it("expect login scene with history", function(done){
+  //   statem.start();
+  //   when(()=>statem.load_Data.active, ()=>statem.success());
+  //   when(()=>statem.promoScene.active, ()=>statem.handle("error"));
+  //   when(()=>statem.error.active, ()=>{
+  //     statem.error.handled();
+  //     when(()=>statem.promoScene.active, done);
+  //   });
+  // });
   
   it("expect logged scene", function(done){
     statem.storage = {load: function(){return {a:1, b:2}}};
