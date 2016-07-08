@@ -127,10 +127,13 @@ export default class State {
   };
   
   @action pop = () => {
-    assert(this.stack.length > 1, "Empty stack, cannot pop");
-    this.stack.pop();
-    this.index = this.stack.length - 1;
-    const data = this.stack[this.index];
-    this.sm.handle(toLower(data.name), {pop: true});
+    if (this.stack.length <= 1){
+      this.parent.pop();
+    } else {
+      this.stack.pop();
+      this.index = this.stack.length - 1;
+      const data = this.stack[this.index];
+      this.sm.handle(toLower(data.name), {pop: true});
+    }
   }
 }
