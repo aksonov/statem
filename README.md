@@ -3,9 +3,11 @@ Next-gen state management based on Harel Statechart and SCXML
 
 The big problem with complex application state is how to understand it and see whole picture from source code.
 "A Picture Costs A Thousand Words" - it is true for application state as well. UML solves this problem but requires additional
-efforts from a developer to draw all state diagrams.
+efforts from a developer to draw all state diagrams. 
 
 David Harel in the 1980s introduced *statechart* (now it became part of UML specification) that solves problems above. [SCXML or the "State Chart extensible Markup Language"](http://www.w3.org/TR/scxml/) - an XML language that provides a generic state-machine based execution environment based on Harel statecharts. It is W3C approved standard that allows you to describe all your states as XML file. SCXML is very flexible and allows you to define compound and parallel states (so our logged state will handle disconnect event and show disconnection error to user and all logged UI screens could inherit it and don't care about this event) as well as conditional transitions. Each state could have onEntry, onExit runnable actions and transitions could have such custom actions as well.
+
+This tool provides automatic code generation from given statechart and allow to manage whole state of your app visually.
 
 Here is the state chart diagram that describes the behavior of a stopwatch:
 
@@ -187,12 +189,6 @@ and then run watcher `npm run watch`
 import createState from '../gen/state';
 const statem = createState({...rootStore, ...customactions});
 
-```
-
-* If you don't want to do javascript calls inside SCXML, you may also define onEntry/onExit for each state by using
-
-```
-statem.stateId.onEntry = (_event)=>{...}
 ```
 
 Note that all your State IDs should be unique and should start with upper case (like Javascript classes), don't contain space and other special characters (i.e. be valid Javascript identifier). `statem` adds all of them to its instance (starting with lower case). So if you have state ID `Register`, you could access its data via `statem.register`. You may also use register generated class with `import {RegisterState} from '../gen/state'` for strict Flow type checking.
