@@ -100,17 +100,14 @@ var StateMachine = (0, _autobindDecorator2.default)(_class = (_class2 = function
       _this.listeners.forEach(function (listener) {
         return _this.interpreter.registerListener(listener);
       });
-      _this.interpreter._evaluateAction = function (currentEvent, actionRef) {
-        return actionRef.call(this._scriptingContext, currentEvent); //SCXML system variables
-      };
+      // this.interpreter._evaluateAction = function(currentEvent, actionRef) {
+      //   return actionRef.call(this._scriptingContext, currentEvent);     //SCXML system variables
+      // };
       _this.interpreter.start();
     };
 
     this.handle = function (event, data) {
-      //console.log(`EVENT: ${event} DATA: ${data}`);
-      setTimeout(function () {
-        return _this.interpreter.gen(event, data);
-      });
+      _this.interpreter.gen(event, data);
     };
 
     this.promise = function (_ref) {
@@ -133,16 +130,24 @@ var StateMachine = (0, _autobindDecorator2.default)(_class = (_class2 = function
       }
       if (res && res.then) {
         res.then(function (response) {
-          _this.success(key ? _defineProperty({}, key, response) : response);
+          setTimeout(function () {
+            return _this.success(key ? _defineProperty({}, key, response) : response);
+          });
         }).catch(function (e) {
           //throw(`scxml eval error, column: ${$column} line: ${$line}, ${e}`);
-          _this.failure({ error: e });
+          setTimeout(function () {
+            return _this.failure({ error: e });
+          });
         });
       } else {
         if (res) {
-          _this.success(key ? _defineProperty({}, key, res) : res);
+          setTimeout(function () {
+            return _this.success(key ? _defineProperty({}, key, res) : res);
+          });
         } else {
-          _this.failure({ error: error });
+          setTimeout(function () {
+            return _this.failure({ error: error });
+          });
         }
       }
     };

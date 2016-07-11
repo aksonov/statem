@@ -2,7 +2,7 @@ import {when, action, autorun, observable, spy} from 'mobx';
 import {expect} from 'chai';
 import statem from './genstate';
 
-statem.listener = {onEntry:state=>console.log(`ENTER STATE:${state}`)};
+statem.listeners.push({onEntry:state=>console.log(`ENTER STATE:${state}`)});
 statem.xmpp = {login(a) { return a===1 ? {result:1} : false }};
 statem.storage = {load: function(){return {}}};
 
@@ -27,23 +27,23 @@ describe("test", function() {
     statem.start();
     when(()=>statem.load_Profile.active, ()=>{
       expect(statem.load_Profile.model.result).to.be.equal(1);
-      statem.success({handle:'test'});
+      setTimeout(()=>statem.success({handle:'test'}));
     });
     when (()=>statem.homeScene.active, ()=> {
-      statem.drawerTabs.friendsScene({msg: "hello"});
+      setTimeout(()=>statem.drawerTabs.friendsScene({msg: "hello"}));
     });
     
     when(()=>statem.searchFriends.active, ()=> {
-      statem.friendsScene.addFriendByUsername({user:'test'});
+      setTimeout(()=>statem.friendsScene.addFriendByUsername({user:'test'}));
     });
     
     when(()=>statem.addFriendByUsername.active, ()=>{
       expect(statem.drawerTabs.stack.length).to.be.equal(2);
       expect(statem.friendsScene.stack.length).to.be.equal(2);
-      statem.drawerTabs.homeScene();
+      setTimeout(()=>statem.drawerTabs.homeScene());
       // switch back and verify that addFriendsByUsername is selected
       when(()=>statem.homeScene.active, ()=> {
-        statem.drawerTabs.friendsScene();
+        setTimeout(()=>statem.drawerTabs.friendsScene());
         when(()=>statem.addFriendByUsername.active, done);
       });
     });

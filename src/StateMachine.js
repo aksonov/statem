@@ -29,15 +29,14 @@ export default class StateMachine {
     this.initialState  = new StateClass(this.initialState, null, this);
     this.interpreter = new scion.Statechart(this.initialState, {console});
     this.listeners.forEach(listener => this.interpreter.registerListener(listener));
-    this.interpreter._evaluateAction = function(currentEvent, actionRef) {
-      return actionRef.call(this._scriptingContext, currentEvent);     //SCXML system variables
-    };
+    // this.interpreter._evaluateAction = function(currentEvent, actionRef) {
+    //   return actionRef.call(this._scriptingContext, currentEvent);     //SCXML system variables
+    // };
     this.interpreter.start();
   };
 
   handle = (event, data) => {
-    //console.log(`EVENT: ${event} DATA: ${data}`);
-    setTimeout(()=>this.interpreter.gen(event, data));
+    this.interpreter.gen(event, data);
   };
 
   promise = ({wrap, content, $column, $line})=> {
@@ -55,16 +54,16 @@ export default class StateMachine {
     }
     if (res && res.then){
       res.then(response=>{
-        this.success(key ? {[key]: response} : response);
+        setTimeout(()=>this.success(key ? {[key]: response} : response));
       }).catch(e => {
         //throw(`scxml eval error, column: ${$column} line: ${$line}, ${e}`);
-        this.failure({ error: e })
+        setTimeout(()=>this.failure({ error: e }));
       });
     } else {
       if (res){
-        this.success(key ? {[key] : res} : res)
+        setTimeout(()=>this.success(key ? {[key] : res} : res));
       } else {
-        this.failure( {error});
+        setTimeout(()=>this.failure( {error}));
       }
     }
   };
