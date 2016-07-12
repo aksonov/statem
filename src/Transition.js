@@ -18,15 +18,15 @@ export default class Transition {
     assert(parent, "Parent should be defined for transition:" + this.event);
 
     this.onTransition = (params)=>{
-      data.onentry && data.onentry(params);
-      if (this.mode === 'push'){
-        assert(data.target, "Target should be defined for push transition");
-        parent.push({name: data.target, data:params && params.data || {}});
-      }
-      if (this.mode === 'jump'){
-        assert(data.target, "Target should be defined for push transition");
-        parent.jump({name: data.target, data:params && params.data || {}});
-      }
+      data.ontransition && data.ontransition(params);
+      // if (this.mode === 'push'){
+      //   assert(data.target, "Target should be defined for push transition");
+      //   parent.push({name: data.target, data:params && params.data || {}});
+      // }
+      // if (this.mode === 'jump'){
+      //   assert(data.target, "Target should be defined for push transition");
+      //   parent.jump({name: data.target, data:params && params.data || {}});
+      // }
     }
     
   }

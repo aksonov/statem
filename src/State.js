@@ -20,6 +20,7 @@ export default class State {
   sm;
   parent;
   $type;
+  @observable shouldPop = false;
   
   constructor(data, parent, sm){
     assert(data, "No state data is defined!");
@@ -62,38 +63,64 @@ export default class State {
 
   onEntry = this.onEntryAction;
   
-  @action onEntryAction = (_event) => {
-    this.active = true;
+  onChildEntry = (child) => {
+    console.log(`ID:${child.id}`);
+    if (this.isSwitch){
+      console.log("JUMP");
+      this.jump({name: child.id, data:child.props});
+    } else {
+      if (child.props.pop){
+        console.log("POP");
+      } else if (this.stack.find(el=>el.id === child.id)){
+        console.log("ALREADY EXISTS, NO PUSH");
+      } else {
+        this.push({name: child.id, data:child.props});
+        console.log("PUSHED");
+      }
+    }
+  };
+  
+  @action onEntryAction = (_event = {}) => {
+    console.log(`ENTER STATE:`, this.id);
+    this.shouldPop = false;
     if (_event && _event.data){
       this.props = _event.data;
     }
     if (this.onentry){
       this.onentry(_event);
     }
+    if (this.parent && this.parent.isContainer && this.parent[toLower(this.id)]){
+      this.parent.onChildEntry(this);
+    }
+    this.active = true;
   }
   
   onExit = this.onExitAction;
   
   @action onExitAction = (_event) => {
+    console.log(`EXIT STATE:`, this.id);
     this.props = {};
     this.active = false;
     this.clear();
     if (this.onexit){
+      console.log(`ONEXITF`, this.onexit);
       this.onexit(_event);
     }
   };
 
   
   success = (data) => {
-    this.sm.handle("success", data);
+    this.handle("success", data);
   };
   
   failure = (data) => {
-    this.sm.handle("failure", data);
+    this.handle("failure", data);
   };
   
   handle = (name, data) => {
+    console.log("HANDLE ", name, "FROM", this.id, this.active);
     if (!this.active && this.parent[toLower(this.id)]){
+      console.log("CALL PARENT",toLower(this.id));
       this.parent[toLower(this.id)]();
     }
     this.sm.handle(name, data);
@@ -116,7 +143,7 @@ export default class State {
   
   
   clear = () => {
-    //this.stack.replace(this.stack.slice(1));
+    //this.stack.replace([]);
   };
 
   @action replace = (data) => {
@@ -126,14 +153,19 @@ export default class State {
     this.stack[this.stack.length - 1] = data;
   };
   
-  @action pop = () => {
-    if (this.stack.length <= 1){
+  @action pop = (next, props) => {
+    console.log("POP", this.id);
+    if (this.stack.length <= 1 && this.parent && this.parent.isContainer){
       this.parent.pop();
     } else {
+      console.log("STACK:", this.stack.length, this.stack[this.stack.length-1].name);
       this.stack.pop();
       this.index = this.stack.length - 1;
       const data = this.stack[this.index];
-      this.sm.handle(toLower(data.name), {pop: true});
+      setTimeout(()=>this.handle(toLower(data.name), {pop: true}));
+    }
+    if (next){
+      setTimeout(()=>next(props), 500);
     }
   }
 }

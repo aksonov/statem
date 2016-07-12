@@ -41,7 +41,7 @@ import {action, computed, observable} from 'mobx';
         {{# mode}} mode: "{{mode}}", {{/mode}}
         {{# cond}} cond: {{& cond}}, {{/cond}}
         {{# target}} target:"{{ target }}", {{/target}}
-        {{# ontransition}}onentry:{{& ontransition}}, {{/ ontransition}}
+        {{# ontransition}}ontransition:{{& ontransition}}, {{/ ontransition}}
         });
     {{/transitions}}
 
@@ -51,11 +51,16 @@ import {action, computed, observable} from 'mobx';
 
     if (this.states && this.states.length){
         const initial = this.initial || this.states[0].id;
-    for (let i=0;i<{{# isSwitch }}this.states.length {{/ isSwitch}}{{^ isSwitch }}1 {{/ isSwitch}};i++){
-            this.stack.push({name: this.states[i].id});
-            }
+        //this.stack.push({name: initial});
 
+    {{# isSwitch }}
+        this.isSwitch = true;
+        for (let i=0;i<this.states.length;i++){
+                this.stack.push({name: this.states[i].id});
+        }
+    {{/isSwitch}}
             {{# isContainer }}
+                this.isContainer = true;
                 this.states.splice(0, 0, {id: this.id+'History', type:'deep', $type: 'history', transitions:[{target:initial}]});
                 this.initial = this.id+'History';
             {{/isContainer}}
