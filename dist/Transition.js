@@ -19,8 +19,6 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 var DEFAULT = exports.DEFAULT = "default";
 
 var Transition = function Transition(parent, data) {
-  var _this = this;
-
   _classCallCheck(this, Transition);
 
   (0, _assert2.default)(data, "Data should be defined");
@@ -28,15 +26,15 @@ var Transition = function Transition(parent, data) {
   (0, _assert2.default)(parent, "Parent should be defined for transition:" + this.event);
 
   this.onTransition = function (params) {
-    data.onentry && data.onentry(params);
-    if (_this.mode === 'push') {
-      (0, _assert2.default)(data.target, "Target should be defined for push transition");
-      parent.push({ name: data.target, data: params && params.data || {} });
-    }
-    if (_this.mode === 'jump') {
-      (0, _assert2.default)(data.target, "Target should be defined for push transition");
-      parent.jump({ name: data.target, data: params && params.data || {} });
-    }
+    data.ontransition && data.ontransition(params);
+    // if (this.mode === 'push'){
+    //   assert(data.target, "Target should be defined for push transition");
+    //   parent.push({name: data.target, data:params && params.data || {}});
+    // }
+    // if (this.mode === 'jump'){
+    //   assert(data.target, "Target should be defined for push transition");
+    //   parent.jump({name: data.target, data:params && params.data || {}});
+    // }
   };
 };
 

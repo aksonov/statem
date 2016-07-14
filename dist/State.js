@@ -5,7 +5,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.default = undefined;
 
-var _desc, _value, _class, _descriptor, _descriptor2, _descriptor3, _descriptor4, _descriptor5, _descriptor6, _descriptor7, _descriptor8, _descriptor9, _descriptor10, _class2, _temp, _initialiseProps; // Copyright (c) 2016, Pavlo Aksonov
+var _desc, _value, _class, _descriptor, _descriptor2, _descriptor3, _descriptor4, _descriptor5, _descriptor6, _descriptor7, _descriptor8, _descriptor9, _descriptor10, _descriptor11, _class2, _temp, _initialiseProps; // Copyright (c) 2016, Pavlo Aksonov
 // All rights reserved.
 
 var _mobx = require('mobx');
@@ -140,40 +140,63 @@ var State = (_class = (_temp = _class2 = function State(data, parent, sm) {
 
   _initDefineProp(this, 'active', _descriptor4, this);
 
+  _initDefineProp(this, 'shouldPop', _descriptor5, this);
+
   this.onEntry = this.onEntryAction;
 
-  _initDefineProp(this, 'onEntryAction', _descriptor5, this);
+  this.onChildEntry = function (child) {
+    console.log('ID:' + child.id);
+    if (_this2.isSwitch) {
+      console.log("JUMP");
+      _this2.jump({ name: child.id, data: child.props });
+    } else {
+      if (child.props.pop) {
+        console.log("POP");
+      } else if (_this2.stack.find(function (el) {
+        return el.id === child.id;
+      })) {
+        console.log("ALREADY EXISTS, NO PUSH");
+      } else {
+        _this2.push({ name: child.id, data: child.props });
+        console.log("PUSHED");
+      }
+    }
+  };
+
+  _initDefineProp(this, 'onEntryAction', _descriptor6, this);
 
   this.onExit = this.onExitAction;
 
-  _initDefineProp(this, 'onExitAction', _descriptor6, this);
+  _initDefineProp(this, 'onExitAction', _descriptor7, this);
 
   this.success = function (data) {
-    _this2.sm.handle("success", data);
+    _this2.handle("success", data);
   };
 
   this.failure = function (data) {
-    _this2.sm.handle("failure", data);
+    _this2.handle("failure", data);
   };
 
   this.handle = function (name, data) {
+    console.log("HANDLE ", name, "FROM", _this2.id, _this2.active);
     if (!_this2.active && _this2.parent[toLower(_this2.id)]) {
+      console.log("CALL PARENT", toLower(_this2.id));
       _this2.parent[toLower(_this2.id)]();
     }
     _this2.sm.handle(name, data);
   };
 
-  _initDefineProp(this, 'push', _descriptor7, this);
+  _initDefineProp(this, 'push', _descriptor8, this);
 
-  _initDefineProp(this, 'jump', _descriptor8, this);
+  _initDefineProp(this, 'jump', _descriptor9, this);
 
   this.clear = function () {
-    //this.stack.replace(this.stack.slice(1));
+    //this.stack.replace([]);
   };
 
-  _initDefineProp(this, 'replace', _descriptor9, this);
+  _initDefineProp(this, 'replace', _descriptor10, this);
 
-  _initDefineProp(this, 'pop', _descriptor10, this);
+  _initDefineProp(this, 'pop', _descriptor11, this);
 }, _temp), (_descriptor = _applyDecoratedDescriptor(_class.prototype, 'props', [_mobx.observable], {
   enumerable: true,
   initializer: function initializer() {
@@ -194,36 +217,50 @@ var State = (_class = (_temp = _class2 = function State(data, parent, sm) {
   initializer: function initializer() {
     return false;
   }
-}), _descriptor5 = _applyDecoratedDescriptor(_class.prototype, 'onEntryAction', [_mobx.action], {
+}), _descriptor5 = _applyDecoratedDescriptor(_class.prototype, 'shouldPop', [_mobx.observable], {
+  enumerable: true,
+  initializer: function initializer() {
+    return false;
+  }
+}), _descriptor6 = _applyDecoratedDescriptor(_class.prototype, 'onEntryAction', [_mobx.action], {
   enumerable: true,
   initializer: function initializer() {
     var _this3 = this;
 
-    return function (_event) {
-      _this3.active = true;
+    return function () {
+      var _event = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+
+      console.log('ENTER STATE:', _this3.id);
+      _this3.shouldPop = false;
       if (_event && _event.data) {
         _this3.props = _event.data;
       }
       if (_this3.onentry) {
         _this3.onentry(_event);
       }
+      if (_this3.parent && _this3.parent.isContainer && _this3.parent[toLower(_this3.id)]) {
+        _this3.parent.onChildEntry(_this3);
+      }
+      _this3.active = true;
     };
   }
-}), _descriptor6 = _applyDecoratedDescriptor(_class.prototype, 'onExitAction', [_mobx.action], {
+}), _descriptor7 = _applyDecoratedDescriptor(_class.prototype, 'onExitAction', [_mobx.action], {
   enumerable: true,
   initializer: function initializer() {
     var _this4 = this;
 
     return function (_event) {
+      console.log('EXIT STATE:', _this4.id);
       _this4.props = {};
       _this4.active = false;
       _this4.clear();
       if (_this4.onexit) {
+        console.log('ONEXITF', _this4.onexit);
         _this4.onexit(_event);
       }
     };
   }
-}), _descriptor7 = _applyDecoratedDescriptor(_class.prototype, 'push', [_mobx.action], {
+}), _descriptor8 = _applyDecoratedDescriptor(_class.prototype, 'push', [_mobx.action], {
   enumerable: true,
   initializer: function initializer() {
     var _this5 = this;
@@ -235,7 +272,7 @@ var State = (_class = (_temp = _class2 = function State(data, parent, sm) {
       _this5.index = _this5.stack.length - 1;
     };
   }
-}), _descriptor8 = _applyDecoratedDescriptor(_class.prototype, 'jump', [_mobx.action], {
+}), _descriptor9 = _applyDecoratedDescriptor(_class.prototype, 'jump', [_mobx.action], {
   enumerable: true,
   initializer: function initializer() {
     var _this6 = this;
@@ -250,7 +287,7 @@ var State = (_class = (_temp = _class2 = function State(data, parent, sm) {
       _this6.index = i;
     };
   }
-}), _descriptor9 = _applyDecoratedDescriptor(_class.prototype, 'replace', [_mobx.action], {
+}), _descriptor10 = _applyDecoratedDescriptor(_class.prototype, 'replace', [_mobx.action], {
   enumerable: true,
   initializer: function initializer() {
     var _this7 = this;
@@ -262,19 +299,30 @@ var State = (_class = (_temp = _class2 = function State(data, parent, sm) {
       _this7.stack[_this7.stack.length - 1] = data;
     };
   }
-}), _descriptor10 = _applyDecoratedDescriptor(_class.prototype, 'pop', [_mobx.action], {
+}), _descriptor11 = _applyDecoratedDescriptor(_class.prototype, 'pop', [_mobx.action], {
   enumerable: true,
   initializer: function initializer() {
     var _this8 = this;
 
-    return function () {
-      if (_this8.stack.length <= 1) {
+    return function (next, props) {
+      console.log("POP", _this8.id);
+      if (_this8.stack.length <= 1 && _this8.parent && _this8.parent.isContainer) {
         _this8.parent.pop();
       } else {
-        _this8.stack.pop();
-        _this8.index = _this8.stack.length - 1;
-        var data = _this8.stack[_this8.index];
-        _this8.sm.handle(toLower(data.name), { pop: true });
+        (function () {
+          console.log("STACK:", _this8.stack.length, _this8.stack[_this8.stack.length - 1].name);
+          _this8.stack.pop();
+          _this8.index = _this8.stack.length - 1;
+          var data = _this8.stack[_this8.index];
+          setTimeout(function () {
+            return _this8.handle(toLower(data.name), { pop: true });
+          });
+        })();
+      }
+      if (next) {
+        setTimeout(function () {
+          return next(props);
+        }, 500);
       }
     };
   }

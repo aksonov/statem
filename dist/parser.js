@@ -122,6 +122,7 @@ function generate(root, states, parent, parentProps) {
   if (root.transitions) {
     transitions = [];
     root.transitions.forEach(function (el) {
+
       if (el.event === 'push' || el.event === 'jump') {
         isContainer = true;
         var n = {};
@@ -135,8 +136,8 @@ function generate(root, states, parent, parentProps) {
       }
     });
     transitions.forEach(function (t) {
-      if (t.onentry) {
-        t.ontransition = wrapWithFunction(t.onentry.expr, false);
+      if (t.onTransition) {
+        t.ontransition = wrapWithFunction(t.onTransition.map(convert), false);
       }
       if (t.cond) {
         t.cond = wrapWithFunction(t.cond.expr, true);
