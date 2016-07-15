@@ -251,7 +251,6 @@ var State = (_class = (_temp = _class2 = function State(data, parent, sm) {
 
     return function (_event) {
       console.log('EXIT STATE:', _this4.id);
-      _this4.props = {};
       _this4.active = false;
       _this4.clear();
       if (_this4.onexit) {

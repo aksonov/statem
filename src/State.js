@@ -99,7 +99,6 @@ export default class State {
   
   @action onExitAction = (_event) => {
     console.log(`EXIT STATE:`, this.id);
-    this.props = {};
     this.active = false;
     this.clear();
     if (this.onexit){
