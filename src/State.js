@@ -20,7 +20,11 @@ export default class State {
   sm;
   parent;
   $type;
-  @observable shouldPop = false;
+  
+  // listener for state entry/exit
+  listener;
+  // allow to run code after all interactions
+  runner = (func) => func();
   
   constructor(data, parent, sm){
     assert(data, "No state data is defined!");
@@ -69,9 +73,7 @@ export default class State {
       console.log("JUMP");
       this.jump({name: child.id, data:child.props});
     } else {
-      if (child.props.pop){
-        console.log("POP");
-      } else if (this.stack.find(el=>el.id === child.id)){
+      if (this.stack.find(el=>el.id === child.id)){
         console.log("ALREADY EXISTS, NO PUSH");
       } else {
         this.push({name: child.id, data:child.props});
@@ -81,18 +83,19 @@ export default class State {
   };
   
   @action onEntryAction = (_event = {}) => {
-    console.log(`ENTER STATE:`, this.id);
-    this.shouldPop = false;
-    if (_event && _event.data){
+    console.log(`ENTER STATE!:`, this.id);
+    // store data if it is not POP
+    this.active = true;
+    if (_event && _event.data) {
       this.props = _event.data;
     }
-    if (this.onentry){
-      this.onentry(_event);
-    }
+    this.listener && this.listener.onEnter(this.props);
     if (this.parent && this.parent.isContainer && this.parent[toLower(this.id)]){
       this.parent.onChildEntry(this);
     }
-    this.active = true;
+    if (this.onentry){
+      this.runner(()=>this.onentry(_event));
+    }
   }
   
   onExit = this.onExitAction;
@@ -103,7 +106,7 @@ export default class State {
     this.clear();
     if (this.onexit){
       console.log(`ONEXITF`, this.onexit);
-      this.onexit(_event);
+      this.runner(()=>this.onexit(_event));
     }
   };
 
@@ -152,19 +155,18 @@ export default class State {
     this.stack[this.stack.length - 1] = data;
   };
   
-  @action pop = (next, props) => {
+  @action pop = (props) => {
     console.log("POP", this.id);
     if (this.stack.length <= 1 && this.parent && this.parent.isContainer){
       this.parent.pop();
     } else {
-      console.log("STACK:", this.stack.length, this.stack[this.stack.length-1].name);
-      this.stack.pop();
-      this.index = this.stack.length - 1;
-      const data = this.stack[this.index];
-      setTimeout(()=>this.handle(toLower(data.name), {pop: true}));
-    }
-    if (next){
-      setTimeout(()=>next(props), 500);
+      if (this.stack.length > 1){
+        console.log("STACK:", this.stack.length, this.stack[this.stack.length-1].name);
+        this.stack.pop();
+        this.index = this.stack.length - 1;
+        const data = this.stack[this.index];
+        this.handle(toLower(data.name));
+      }
     }
   }
 }
