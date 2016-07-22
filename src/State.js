@@ -104,6 +104,7 @@ export default class State {
     console.log(`EXIT STATE:`, this.id);
     this.active = false;
     this.clear();
+    this.listener && this.listener.onExit(this.props);
     if (this.onexit){
       console.log(`ONEXITF`, this.onexit);
       this.runner(()=>this.onexit(_event));

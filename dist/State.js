@@ -256,6 +256,7 @@ function State(data, parent, sm) {
       console.log('EXIT STATE:', _this4.id);
       _this4.active = false;
       _this4.clear();
+      _this4.listener && _this4.listener.onExit(_this4.props);
       if (_this4.onexit) {
         console.log('ONEXITF', _this4.onexit);
         _this4.runner(function () {
