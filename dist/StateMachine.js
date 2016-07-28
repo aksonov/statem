@@ -115,10 +115,14 @@ var StateMachine = (0, _autobindDecorator2.default)(_class = (_class2 = function
       var content = _ref.content;
       var $column = _ref.$column;
       var $line = _ref.$line;
+      var cond = _ref.cond;
 
       var res = void 0;
       var key = void 0;
       var error = void 0;
+      var condition = cond || function () {
+        return true;
+      };
       if (wrap) {
         key = 'response';
       }
@@ -131,22 +135,23 @@ var StateMachine = (0, _autobindDecorator2.default)(_class = (_class2 = function
       if (res && res.then) {
         res.then(function (response) {
           setTimeout(function () {
-            return _this.success(key ? _defineProperty({}, key, response) : response);
+            _this.success(key ? _defineProperty({}, key, response) : response);
           });
         }).catch(function (e) {
-          //throw(`scxml eval error, column: ${$column} line: ${$line}, ${e}`);
           setTimeout(function () {
-            return _this.failure({ error: e });
+            _this.failure({ error: e });
           });
-        });
+        }).done();
       } else {
-        if (res) {
+        if (res && condition()) {
+          console.log("SUCCESS");
           setTimeout(function () {
-            return _this.success(key ? _defineProperty({}, key, res) : res);
+            _this.success(key ? _defineProperty({}, key, res) : res);
           });
         } else {
+          console.log("FAILURE");
           setTimeout(function () {
-            return _this.failure({ error: error });
+            _this.failure({ error: error });
           });
         }
       }

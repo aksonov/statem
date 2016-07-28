@@ -24,7 +24,7 @@ export default class State {
   // listener for state entry/exit
   listener;
   // allow to run code after all interactions
-  runner = (func) => func();
+  static runner = (func) => func();
   
   constructor(data, parent, sm){
     assert(data, "No state data is defined!");
@@ -94,7 +94,7 @@ export default class State {
       this.parent.onChildEntry(this);
     }
     if (this.onentry){
-      this.runner(()=>this.onentry(_event));
+      State.runner(()=>this.onentry(_event));
     }
   }
   
@@ -107,18 +107,10 @@ export default class State {
     this.listener && this.listener.onExit(this.props);
     if (this.onexit){
       console.log(`ONEXITF`, this.onexit);
-      this.runner(()=>this.onexit(_event));
+      State.runner(()=>this.onexit(_event));
     }
   };
 
-  
-  success = (data) => {
-    this.handle("success", data);
-  };
-  
-  failure = (data) => {
-    this.handle("failure", data);
-  };
   
   handle = (name, data) => {
     console.log("HANDLE ", name, "FROM", this.id, this.active);

@@ -5,7 +5,7 @@ var Mustache = require('mustache');
 var assert = require('assert');
 var transform = require('scxml/lib/compiler/scxml-to-scjson');
 var inc=0;
-var reserved = ['success', 'failure', 'pop', 'onEntry', 'onExit', 'handle', 'jump', 'push', 'clear', 'replace'];
+var reserved = ['pop', 'onEntry', 'onExit', 'handle', 'jump', 'push', 'clear', 'replace'];
 
 function toArray(m){
   var res = [];

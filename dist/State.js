@@ -134,7 +134,9 @@ function State(data, parent, sm) {
   this.onexit = onexit;
 }
 // allow to run code after all interactions
-, _initialiseProps = function _initialiseProps() {
+, _class2.runner = function (func) {
+  return func();
+}, _initialiseProps = function _initialiseProps() {
   var _this2 = this;
 
   _initDefineProp(this, 'props', _descriptor, this);
@@ -144,10 +146,6 @@ function State(data, parent, sm) {
   _initDefineProp(this, 'index', _descriptor3, this);
 
   _initDefineProp(this, 'active', _descriptor4, this);
-
-  this.runner = function (func) {
-    return func();
-  };
 
   this.onEntry = this.onEntryAction;
 
@@ -173,14 +171,6 @@ function State(data, parent, sm) {
   this.onExit = this.onExitAction;
 
   _initDefineProp(this, 'onExitAction', _descriptor6, this);
-
-  this.success = function (data) {
-    _this2.handle("success", data);
-  };
-
-  this.failure = function (data) {
-    _this2.handle("failure", data);
-  };
 
   this.handle = function (name, data) {
     console.log("HANDLE ", name, "FROM", _this2.id, _this2.active);
@@ -241,7 +231,7 @@ function State(data, parent, sm) {
         _this3.parent.onChildEntry(_this3);
       }
       if (_this3.onentry) {
-        _this3.runner(function () {
+        State.runner(function () {
           return _this3.onentry(_event);
         });
       }
@@ -259,7 +249,7 @@ function State(data, parent, sm) {
       _this4.listener && _this4.listener.onExit(_this4.props);
       if (_this4.onexit) {
         console.log('ONEXITF', _this4.onexit);
-        _this4.runner(function () {
+        State.runner(function () {
           return _this4.onexit(_event);
         });
       }

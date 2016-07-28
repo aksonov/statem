@@ -39,10 +39,11 @@ export default class StateMachine {
     this.interpreter.gen(event, data);
   };
 
-  promise = ({wrap, content, $column, $line})=> {
+  promise = ({wrap, content, $column, $line, cond})=> {
     let res;
     let key;
     let error;
+    const condition = cond || (()=>true);
     if (wrap){
       key = 'response';
     }
@@ -54,16 +55,25 @@ export default class StateMachine {
     }
     if (res && res.then){
       res.then(response=>{
-        setTimeout(()=>this.success(key ? {[key]: response} : response));
+        setTimeout(()=>{
+          this.success(key ? {[key]: response} : response)
+        });
       }).catch(e => {
-        //throw(`scxml eval error, column: ${$column} line: ${$line}, ${e}`);
-        setTimeout(()=>this.failure({ error: e }));
-      });
+        setTimeout(()=>{
+            this.failure({ error: e })
+        });
+      }).done();
     } else {
-      if (res){
-        setTimeout(()=>this.success(key ? {[key] : res} : res));
+      if (res && condition()){
+        console.log("SUCCESS");
+        setTimeout(()=>{
+          this.success(key ? {[key] : res} : res)
+        });
       } else {
-        setTimeout(()=>this.failure( {error}));
+        console.log("FAILURE");
+        setTimeout(()=>{
+          this.failure( {error})
+        });
       }
     }
   };
