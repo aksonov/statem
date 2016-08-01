@@ -220,7 +220,7 @@ function State(data, parent, sm) {
     return function () {
       var _event = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
 
-      console.log('ENTER STATE!:', _this3.id);
+      console.log('ENTER STATE!:', _this3.id, _this3.listener);
       // store data if it is not POP
       _this3.active = true;
       if (_event && _event.data) {

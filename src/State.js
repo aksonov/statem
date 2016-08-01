@@ -83,7 +83,7 @@ export default class State {
   };
   
   @action onEntryAction = (_event = {}) => {
-    console.log(`ENTER STATE!:`, this.id);
+    console.log(`ENTER STATE!:`, this.id, this.listener);
     // store data if it is not POP
     this.active = true;
     if (_event && _event.data) {
