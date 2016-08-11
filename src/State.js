@@ -83,31 +83,39 @@ export default class State {
   };
   
   @action onEntryAction = (_event = {}) => {
-    console.log(`ENTER STATE!:`, this.id, this.listener);
-    // store data if it is not POP
-    this.active = true;
-    if (_event && _event.data) {
-      this.props = _event.data;
-    }
-    this.listener && this.listener.onEnter(this.props);
-    if (this.parent && this.parent.isContainer && this.parent[toLower(this.id)]){
-      this.parent.onChildEntry(this);
-    }
-    if (this.onentry){
-      State.runner(()=>this.onentry(_event));
+    try {
+      console.log(`ENTER STATE!:`, this.id, this.listener);
+      // store data if it is not POP
+      this.active = true;
+      if (_event && _event.data) {
+        this.props = _event.data;
+      }
+      this.listener && this.listener.onEnter(this.props);
+      if (this.parent && this.parent.isContainer && this.parent[toLower(this.id)]) {
+        this.parent.onChildEntry(this);
+      }
+      if (this.onentry) {
+        State.runner(()=>this.onentry(_event));
+      }
+    } catch (e){
+      console.error(e)
     }
   }
   
   onExit = this.onExitAction;
   
   @action onExitAction = (_event) => {
-    console.log(`EXIT STATE:`, this.id);
-    this.active = false;
-    this.clear();
-    this.listener && this.listener.onExit(this.props);
-    if (this.onexit){
-      console.log(`ONEXITF`, this.onexit);
-      State.runner(()=>this.onexit(_event));
+    try {
+      console.log(`EXIT STATE:`, this.id);
+      this.active = false;
+      this.clear();
+      this.listener && this.listener.onExit(this.props);
+      if (this.onexit) {
+        console.log(`ONEXITF`, this.onexit);
+        State.runner(()=>this.onexit(_event));
+      }
+    } catch (e){
+      console.error(e)
     }
   };
 

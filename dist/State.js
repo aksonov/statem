@@ -220,20 +220,24 @@ function State(data, parent, sm) {
     return function () {
       var _event = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
 
-      console.log('ENTER STATE!:', _this3.id, _this3.listener);
-      // store data if it is not POP
-      _this3.active = true;
-      if (_event && _event.data) {
-        _this3.props = _event.data;
-      }
-      _this3.listener && _this3.listener.onEnter(_this3.props);
-      if (_this3.parent && _this3.parent.isContainer && _this3.parent[toLower(_this3.id)]) {
-        _this3.parent.onChildEntry(_this3);
-      }
-      if (_this3.onentry) {
-        State.runner(function () {
-          return _this3.onentry(_event);
-        });
+      try {
+        console.log('ENTER STATE!:', _this3.id, _this3.listener);
+        // store data if it is not POP
+        _this3.active = true;
+        if (_event && _event.data) {
+          _this3.props = _event.data;
+        }
+        _this3.listener && _this3.listener.onEnter(_this3.props);
+        if (_this3.parent && _this3.parent.isContainer && _this3.parent[toLower(_this3.id)]) {
+          _this3.parent.onChildEntry(_this3);
+        }
+        if (_this3.onentry) {
+          State.runner(function () {
+            return _this3.onentry(_event);
+          });
+        }
+      } catch (e) {
+        console.error(e);
       }
     };
   }
@@ -243,15 +247,19 @@ function State(data, parent, sm) {
     var _this4 = this;
 
     return function (_event) {
-      console.log('EXIT STATE:', _this4.id);
-      _this4.active = false;
-      _this4.clear();
-      _this4.listener && _this4.listener.onExit(_this4.props);
-      if (_this4.onexit) {
-        console.log('ONEXITF', _this4.onexit);
-        State.runner(function () {
-          return _this4.onexit(_event);
-        });
+      try {
+        console.log('EXIT STATE:', _this4.id);
+        _this4.active = false;
+        _this4.clear();
+        _this4.listener && _this4.listener.onExit(_this4.props);
+        if (_this4.onexit) {
+          console.log('ONEXITF', _this4.onexit);
+          State.runner(function () {
+            return _this4.onexit(_event);
+          });
+        }
+      } catch (e) {
+        console.error(e);
       }
     };
   }
