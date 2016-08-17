@@ -153,16 +153,9 @@ function State(data, parent, sm) {
     console.log('ID:' + child.id);
     if (_this2.isSwitch) {
       console.log("JUMP");
-      _this2.jump({ name: child.id, data: child.props });
+      _this2.jump({ id: child.id, data: child.props });
     } else {
-      if (_this2.stack.find(function (el) {
-        return el.id === child.id;
-      })) {
-        console.log("ALREADY EXISTS, NO PUSH");
-      } else {
-        _this2.push({ name: child.id, data: child.props });
-        console.log("PUSHED");
-      }
+      _this2.push({ id: child.id, data: child.props });
     }
   };
 
@@ -221,10 +214,14 @@ function State(data, parent, sm) {
       var _event = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
 
       try {
-        console.log('ENTER STATE!:', _this3.id, _this3.listener);
+        console.log('ENTER STATE!:', _this3.id, _event, _this3.listener);
         // store data if it is not POP
         _this3.active = true;
         if (_event && _event.data) {
+          if (_event.data.isPop) {
+            console.log("IT IS AFTER POP", _this3.id);
+            return;
+          }
           _this3.props = _event.data;
         }
         _this3.listener && _this3.listener.onEnter(_this3.props);
@@ -270,9 +267,16 @@ function State(data, parent, sm) {
 
     return function (data) {
       (0, _assert2.default)(data, "Empty data");
-      (0, _assert2.default)(data.name, "Empty state name");
-      _this5.stack.push(data);
-      _this5.index = _this5.stack.length - 1;
+      (0, _assert2.default)(data.id, "Empty state name");
+      if (_this5.stack.find(function (el) {
+        return el.id === data.id;
+      })) {
+        console.log("ALREADY EXISTS, NO PUSH");
+      } else {
+        console.log("PUSHED", data.id);
+        _this5.stack.push(data);
+        _this5.index = _this5.stack.length - 1;
+      }
     };
   }
 }), _descriptor8 = _applyDecoratedDescriptor(_class.prototype, 'jump', [_mobx.action], {
@@ -282,11 +286,11 @@ function State(data, parent, sm) {
 
     return function (data) {
       (0, _assert2.default)(data, "Empty data");
-      (0, _assert2.default)(data.name, "Empty state name");
+      (0, _assert2.default)(data.id, "Empty state name");
       var i = _this6.stack.findIndex(function (el) {
-        return el.name === data.name;
+        return el.id === data.id;
       });
-      (0, _assert2.default)(i >= 0, "Cannot jump to non-existing state:" + data.name + " STACK:" + JSON.stringify(_this6.stack));
+      (0, _assert2.default)(i >= 0, "Cannot jump to non-existing state:" + data.id + " STACK:" + JSON.stringify(_this6.stack));
       _this6.index = i;
     };
   }
@@ -308,16 +312,20 @@ function State(data, parent, sm) {
     var _this8 = this;
 
     return function (props) {
+      if (_this8.isSwitch) {
+        console.log("CANNOT POP SWITCH CONTAINER", _this8.id);
+        return;
+      }
       console.log("POP", _this8.id);
       if (_this8.stack.length <= 1 && _this8.parent && _this8.parent.isContainer) {
         _this8.parent.pop();
       } else {
         if (_this8.stack.length > 1) {
-          console.log("STACK:", _this8.stack.length, _this8.stack[_this8.stack.length - 1].name);
+          console.log("STACK:", _this8.stack.length, _this8.stack[_this8.stack.length - 1].id);
           _this8.stack.pop();
           _this8.index = _this8.stack.length - 1;
           var data = _this8.stack[_this8.index];
-          _this8.handle(toLower(data.name));
+          _this8.handle(toLower(data.id), { isPop: true });
         }
       }
     };

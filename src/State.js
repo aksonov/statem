@@ -71,23 +71,22 @@ export default class State {
     console.log(`ID:${child.id}`);
     if (this.isSwitch){
       console.log("JUMP");
-      this.jump({name: child.id, data:child.props});
+      this.jump({id: child.id, data:child.props});
     } else {
-      if (this.stack.find(el=>el.id === child.id)){
-        console.log("ALREADY EXISTS, NO PUSH");
-      } else {
-        this.push({name: child.id, data:child.props});
-        console.log("PUSHED");
-      }
+        this.push({id: child.id, data:child.props});
     }
   };
   
   @action onEntryAction = (_event = {}) => {
     try {
-      console.log(`ENTER STATE!:`, this.id, this.listener);
+      console.log(`ENTER STATE!:`, this.id, _event, this.listener);
       // store data if it is not POP
       this.active = true;
       if (_event && _event.data) {
+        if (_event.data.isPop){
+          console.log("IT IS AFTER POP", this.id);
+          return;
+        }
         this.props = _event.data;
       }
       this.listener && this.listener.onEnter(this.props);
@@ -131,16 +130,21 @@ export default class State {
   
   @action push = (data) => {
     assert(data, "Empty data");
-    assert(data.name, "Empty state name");
-    this.stack.push(data);
-    this.index = this.stack.length - 1;
+    assert(data.id, "Empty state name");
+    if (this.stack.find(el=>el.id === data.id)){
+      console.log("ALREADY EXISTS, NO PUSH");
+    } else {
+      console.log("PUSHED", data.id);
+      this.stack.push(data);
+      this.index = this.stack.length - 1;
+    }
   };
   
   @action jump = (data) => {
     assert(data, "Empty data");
-    assert(data.name, "Empty state name");
-    const i = this.stack.findIndex(el => el.name === data.name);
-    assert(i >= 0, "Cannot jump to non-existing state:"+ data.name+" STACK:"+JSON.stringify(this.stack));
+    assert(data.id, "Empty state name");
+    const i = this.stack.findIndex(el => el.id === data.id);
+    assert(i >= 0, "Cannot jump to non-existing state:"+ data.id+" STACK:"+JSON.stringify(this.stack));
     this.index = i;
   };
   
@@ -157,16 +161,20 @@ export default class State {
   };
   
   @action pop = (props) => {
+    if (this.isSwitch){
+      console.log("CANNOT POP SWITCH CONTAINER", this.id);
+      return;
+    }
     console.log("POP", this.id);
     if (this.stack.length <= 1 && this.parent && this.parent.isContainer){
       this.parent.pop();
     } else {
       if (this.stack.length > 1){
-        console.log("STACK:", this.stack.length, this.stack[this.stack.length-1].name);
+        console.log("STACK:", this.stack.length, this.stack[this.stack.length-1].id);
         this.stack.pop();
         this.index = this.stack.length - 1;
         const data = this.stack[this.index];
-        this.handle(toLower(data.name));
+        this.handle(toLower(data.id), {isPop: true});
       }
     }
   }

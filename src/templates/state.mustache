@@ -51,12 +51,12 @@ import {action, computed, observable} from 'mobx';
 
     if (this.states && this.states.length){
         const initial = this.initial || this.states[0].id;
-        //this.stack.push({name: initial});
+        this.push({id: initial});
 
     {{# isSwitch }}
         this.isSwitch = true;
         for (let i=0;i<this.states.length;i++){
-                this.stack.push({name: this.states[i].id});
+                this.push({id: this.states[i].id});
         }
     {{/isSwitch}}
             {{# isContainer }}
