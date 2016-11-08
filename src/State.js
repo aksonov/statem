@@ -9,6 +9,30 @@ function toLower(id){
   return id.charAt(0).toLowerCase() + id.slice(1);
 }
 
+function filterParam(data) {
+  const proto = (data || {}).constructor.name;
+  // avoid passing React Native parameters
+  if (!data){
+    return {};
+  }
+  if (proto !== 'Object') {
+    if (typeof(data) === 'number' || typeof(data)==='boolean'){
+      return data;
+    }
+    if (proto === 'Number' || proto === 'Boolean'  || proto === 'String'){
+      return data;
+    }
+    //console.log("PROTO:", proto);
+    return data.toString();
+  }
+  const res = {};
+  for (const key of Object.keys(data)){
+    //console.log("PROCESSING:", key);
+    res[key] = filterParam(data[key]);
+  }
+  return res;
+}
+
 export default class State {
   id;
   @observable props = {};
@@ -79,7 +103,6 @@ export default class State {
   
   @action onEntryAction = (_event = {}) => {
     try {
-      console.log(`ENTER STATE!:`, this.id, _event, this.listener);
       // store data if it is not POP
       this.active = true;
       if (_event && _event.data) {
@@ -87,7 +110,7 @@ export default class State {
           console.log("IT IS AFTER POP", this.id);
           return;
         }
-        this.props = _event.data;
+        this.props = filterParam(_event.data);
       }
       this.listener && this.listener.onEnter(this.props);
       if (this.parent && this.parent.isContainer && this.parent[toLower(this.id)]) {

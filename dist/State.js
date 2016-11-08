@@ -69,6 +69,52 @@ function toLower(id) {
   return id.charAt(0).toLowerCase() + id.slice(1);
 }
 
+function filterParam(data) {
+  var proto = (data || {}).constructor.name;
+  // avoid passing React Native parameters
+  if (!data) {
+    return {};
+  }
+  if (proto !== 'Object') {
+    if (typeof data === 'number' || typeof data === 'boolean') {
+      return data;
+    }
+    if (proto === 'Number' || proto === 'Boolean' || proto === 'String') {
+      return data;
+    }
+    //console.log("PROTO:", proto);
+    return data.toString();
+  }
+  var res = {};
+  var _iteratorNormalCompletion = true;
+  var _didIteratorError = false;
+  var _iteratorError = undefined;
+
+  try {
+    for (var _iterator = Object.keys(data)[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+      var key = _step.value;
+
+      //console.log("PROCESSING:", key);
+      res[key] = filterParam(data[key]);
+    }
+  } catch (err) {
+    _didIteratorError = true;
+    _iteratorError = err;
+  } finally {
+    try {
+      if (!_iteratorNormalCompletion && _iterator.return) {
+        _iterator.return();
+      }
+    } finally {
+      if (_didIteratorError) {
+        throw _iteratorError;
+      }
+    }
+  }
+
+  return res;
+}
+
 var State = (_class = (_temp = _class2 =
 
 // listener for state entry/exit
@@ -214,7 +260,6 @@ function State(data, parent, sm) {
       var _event = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
 
       try {
-        console.log('ENTER STATE!:', _this3.id, _event, _this3.listener);
         // store data if it is not POP
         _this3.active = true;
         if (_event && _event.data) {
@@ -222,7 +267,7 @@ function State(data, parent, sm) {
             console.log("IT IS AFTER POP", _this3.id);
             return;
           }
-          _this3.props = _event.data;
+          _this3.props = filterParam(_event.data);
         }
         _this3.listener && _this3.listener.onEnter(_this3.props);
         if (_this3.parent && _this3.parent.isContainer && _this3.parent[toLower(_this3.id)]) {
