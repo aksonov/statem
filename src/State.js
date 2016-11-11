@@ -10,11 +10,11 @@ function toLower(id){
 }
 
 function filterParam(data) {
-  const proto = (data || {}).constructor.name;
-  // avoid passing React Native parameters
-  if (!data){
+  if (data === undefined || data === null){
     return {};
   }
+  const proto = data.constructor.name;
+  // avoid passing React Native parameters
   if (proto !== 'Object') {
     if (typeof(data) === 'number' || typeof(data)==='boolean'){
       return data;
