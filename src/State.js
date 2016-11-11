@@ -10,8 +10,11 @@ function toLower(id){
 }
 
 function filterParam(data) {
+  if (data === ''){
+    return '';
+  }
   if (data === undefined || data === null){
-    return {};
+    return data;
   }
   const proto = data.constructor.name;
   // avoid passing React Native parameters
@@ -27,8 +30,8 @@ function filterParam(data) {
   }
   const res = {};
   for (const key of Object.keys(data)){
-    //console.log("PROCESSING:", key);
     res[key] = filterParam(data[key]);
+    //console.log("PROCESSING:", key, data[key], res[key]);
   }
   return res;
 }

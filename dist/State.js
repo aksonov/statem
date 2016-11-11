@@ -70,8 +70,11 @@ function toLower(id) {
 }
 
 function filterParam(data) {
+  if (data === '') {
+    return '';
+  }
   if (data === undefined || data === null) {
-    return {};
+    return data;
   }
   var proto = data.constructor.name;
   // avoid passing React Native parameters
@@ -94,8 +97,8 @@ function filterParam(data) {
     for (var _iterator = Object.keys(data)[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
       var key = _step.value;
 
-      //console.log("PROCESSING:", key);
       res[key] = filterParam(data[key]);
+      //console.log("PROCESSING:", key, data[key], res[key]);
     }
   } catch (err) {
     _didIteratorError = true;
