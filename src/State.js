@@ -29,8 +29,9 @@ function filterParam(data) {
     return data.toString();
   }
   const res = {};
-  for (const key of Object.keys(data)){
-    res[key] = filterParam(data[key]);
+  const keys = Object.keys(data);
+  for (let i=0;i<keys.length;i++){
+    res[keys[i]] = filterParam(data[keys[i]]);
     //console.log("PROCESSING:", key, data[key], res[key]);
   }
   return res;

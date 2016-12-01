@@ -89,32 +89,11 @@ function filterParam(data) {
     return data.toString();
   }
   var res = {};
-  var _iteratorNormalCompletion = true;
-  var _didIteratorError = false;
-  var _iteratorError = undefined;
-
-  try {
-    for (var _iterator = Object.keys(data)[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-      var key = _step.value;
-
-      res[key] = filterParam(data[key]);
-      //console.log("PROCESSING:", key, data[key], res[key]);
-    }
-  } catch (err) {
-    _didIteratorError = true;
-    _iteratorError = err;
-  } finally {
-    try {
-      if (!_iteratorNormalCompletion && _iterator.return) {
-        _iterator.return();
-      }
-    } finally {
-      if (_didIteratorError) {
-        throw _iteratorError;
-      }
-    }
+  var keys = Object.keys(data);
+  for (var i = 0; i < keys.length; i++) {
+    res[keys[i]] = filterParam(data[keys[i]]);
+    //console.log("PROCESSING:", key, data[key], res[key]);
   }
-
   return res;
 }
 
