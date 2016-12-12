@@ -161,8 +161,13 @@ export default class State {
     if (this.stack.find(el=>el.id === data.id)){
       console.log("ALREADY EXISTS, NO PUSH");
     } else {
-      console.log("PUSHED", data.id);
-      this.stack.push(data);
+      console.log("PUSHED", data.id, JSON.stringify(data));
+      if (data.data && data.data.reset){
+        console.log("RESET STACK");
+        this.stack = [data];
+      } else {
+        this.stack.push(data);
+      }
       this.index = this.stack.length - 1;
     }
   };
@@ -194,14 +199,17 @@ export default class State {
     }
     console.log("POP", this.id);
     if (this.stack.length <= 1 && this.parent && this.parent.isContainer){
+      console.log("PARENT POP");
       this.parent.pop();
     } else {
       if (this.stack.length > 1){
-        console.log("STACK:", this.stack.length, this.stack[this.stack.length-1].id);
+        console.log("STACK:", JSON.stringify(this.stack));
         this.stack.pop();
         this.index = this.stack.length - 1;
         const data = this.stack[this.index];
         this.handle(toLower(data.id), {isPop: true});
+      } else {
+        console.log("CANNOT POP, STACK !>1", this.stack.length);
       }
     }
   }

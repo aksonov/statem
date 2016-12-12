@@ -300,8 +300,13 @@ function State(data, parent, sm) {
       })) {
         console.log("ALREADY EXISTS, NO PUSH");
       } else {
-        console.log("PUSHED", data.id);
-        _this5.stack.push(data);
+        console.log("PUSHED", data.id, JSON.stringify(data));
+        if (data.data && data.data.reset) {
+          console.log("RESET STACK");
+          _this5.stack = [data];
+        } else {
+          _this5.stack.push(data);
+        }
         _this5.index = _this5.stack.length - 1;
       }
     };
@@ -345,14 +350,17 @@ function State(data, parent, sm) {
       }
       console.log("POP", _this8.id);
       if (_this8.stack.length <= 1 && _this8.parent && _this8.parent.isContainer) {
+        console.log("PARENT POP");
         _this8.parent.pop();
       } else {
         if (_this8.stack.length > 1) {
-          console.log("STACK:", _this8.stack.length, _this8.stack[_this8.stack.length - 1].id);
+          console.log("STACK:", JSON.stringify(_this8.stack));
           _this8.stack.pop();
           _this8.index = _this8.stack.length - 1;
           var data = _this8.stack[_this8.index];
           _this8.handle(toLower(data.id), { isPop: true });
+        } else {
+          console.log("CANNOT POP, STACK !>1", _this8.stack.length);
         }
       }
     };

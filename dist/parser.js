@@ -123,7 +123,7 @@ function generate(root, states, parent, parentProps) {
     transitions = [];
     root.transitions.forEach(function (el) {
 
-      if (el.event === 'push' || el.event === 'jump') {
+      if (el.event === 'push' || el.event === 'jump' || el.event === 'reset') {
         isContainer = true;
         var n = {};
         if (el.event === 'jump') {
