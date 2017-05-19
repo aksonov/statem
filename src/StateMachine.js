@@ -11,7 +11,7 @@ function filterParam(data = {}) {
   var proto = data.constructor.name;
 
   // avoid passing React Native parameters
-  if (proto === 'ResponderSyntheticEvent') {
+  if (data.nativeEvent && data.target) {
     return {};
   }
   return data;
