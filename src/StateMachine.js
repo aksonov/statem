@@ -8,13 +8,10 @@ import assert from 'assert';
 import {observable} from 'mobx';
 
 function filterParam(data = {}) {
-  if (data.toString() !== '[object Object]') {
-    return { data };
-  }
-  const proto = (data || {}).constructor.name;
+  var proto = data.constructor.name;
 
   // avoid passing React Native parameters
-  if (!data || (proto !== 'Object')) {
+  if (proto === 'ResponderSyntheticEvent') {
     return {};
   }
   return data;
