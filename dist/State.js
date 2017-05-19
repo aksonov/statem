@@ -108,15 +108,15 @@ function State(data, parent, sm) {
   _initialiseProps.call(this);
 
   (0, _assert2.default)(data, "No state data is defined!");
-  var id = data.id;
-  var $type = data.$type;
-  var transition = data.transition;
-  var transitions = data.transitions;
-  var state = data.state;
-  var states = data.states;
-  var onentry = data.onentry;
-  var onexit = data.onexit;
-  var initial = data.initial;
+  var id = data.id,
+      $type = data.$type,
+      transition = data.transition,
+      transitions = data.transitions,
+      state = data.state,
+      states = data.states,
+      onentry = data.onentry,
+      onexit = data.onexit,
+      initial = data.initial;
 
   (0, _assert2.default)(id, "State should contain id");
   (0, _assert2.default)(sm, "StateMachine instance is not defined");
@@ -239,7 +239,7 @@ function State(data, parent, sm) {
     var _this3 = this;
 
     return function () {
-      var _event = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+      var _event = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 
       try {
         // store data if it is not POP

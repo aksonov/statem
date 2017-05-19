@@ -77,6 +77,19 @@ function _initializerWarningHelper(descriptor, context) {
   throw new Error('Decorating class property failed. Please ensure that transform-class-properties is enabled.');
 }
 
+function filterParam(data) {
+  if (data.toString() !== '[object Object]') {
+    return { data: data };
+  }
+  var proto = (data || {}).constructor.name;
+
+  // avoid passing React Native parameters
+  if (!data || proto !== 'Object') {
+    return {};
+  }
+  return data;
+}
+
 var StateMachine = (0, _autobindDecorator2.default)(_class = (_class2 = function () {
   function StateMachine(initialState, RootClass) {
     var _this = this;
@@ -107,15 +120,16 @@ var StateMachine = (0, _autobindDecorator2.default)(_class = (_class2 = function
     };
 
     this.handle = function (event, data) {
-      _this.interpreter.gen(event, data);
+      var filtered = filterParam(data);
+      _this.interpreter.gen(event, filtered);
     };
 
     this.promise = function (_ref) {
-      var wrap = _ref.wrap;
-      var content = _ref.content;
-      var $column = _ref.$column;
-      var $line = _ref.$line;
-      var cond = _ref.cond;
+      var wrap = _ref.wrap,
+          content = _ref.content,
+          $column = _ref.$column,
+          $line = _ref.$line,
+          cond = _ref.cond;
 
       var res = void 0;
       var key = void 0;
@@ -185,8 +199,8 @@ var StateMachine = (0, _autobindDecorator2.default)(_class = (_class2 = function
     value: function on(_ref4) {
       var _this2 = this;
 
-      var content = _ref4.content;
-      var event = _ref4.event;
+      var content = _ref4.content,
+          event = _ref4.event;
 
       var stream = content();
       if (!this.handlers[event]) {
@@ -198,11 +212,11 @@ var StateMachine = (0, _autobindDecorator2.default)(_class = (_class2 = function
   }, {
     key: 'action',
     value: function action(_ref5) {
-      var event = _ref5.event;
-      var expr = _ref5.expr;
-      var $column = _ref5.$column;
-      var $line = _ref5.$line;
-      var cond = _ref5.cond;
+      var event = _ref5.event,
+          expr = _ref5.expr,
+          $column = _ref5.$column,
+          $line = _ref5.$line,
+          cond = _ref5.cond;
 
       try {
         if (cond && !cond()) {
@@ -232,9 +246,9 @@ var StateMachine = (0, _autobindDecorator2.default)(_class = (_class2 = function
   }, {
     key: 'script',
     value: function script(_ref6) {
-      var content = _ref6.content;
-      var $column = _ref6.$column;
-      var $line = _ref6.$line;
+      var content = _ref6.content,
+          $column = _ref6.$column,
+          $line = _ref6.$line;
 
       try {
         content();
@@ -245,9 +259,9 @@ var StateMachine = (0, _autobindDecorator2.default)(_class = (_class2 = function
   }, {
     key: 'log',
     value: function log(_ref7) {
-      var expr = _ref7.expr;
-      var $column = _ref7.$column;
-      var $line = _ref7.$line;
+      var expr = _ref7.expr,
+          $column = _ref7.$column,
+          $line = _ref7.$line;
 
       try {
         console.log(expr());

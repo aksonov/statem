@@ -7,6 +7,20 @@ import autobind from 'autobind-decorator';
 import assert from 'assert';
 import {observable} from 'mobx';
 
+function filterParam(data) {
+  if (data.toString() !== '[object Object]') {
+    return { data };
+  }
+  const proto = (data || {}).constructor.name;
+
+  // avoid passing React Native parameters
+  if (!data || (proto !== 'Object')) {
+    return {};
+  }
+  return data;
+}
+
+
 @autobind
 export default class StateMachine {
   interpreter;
@@ -36,7 +50,8 @@ export default class StateMachine {
   };
 
   handle = (event, data) => {
-    this.interpreter.gen(event, data);
+    const filtered = filterParam(data);
+    this.interpreter.gen(event, filtered);
   };
 
   promise = ({wrap, content, $column, $line, cond})=> {
