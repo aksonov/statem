@@ -7,7 +7,7 @@ import autobind from 'autobind-decorator';
 import assert from 'assert';
 import {observable} from 'mobx';
 
-function filterParam(data) {
+function filterParam(data = {}) {
   if (data.toString() !== '[object Object]') {
     return { data };
   }

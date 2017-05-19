@@ -77,7 +77,9 @@ function _initializerWarningHelper(descriptor, context) {
   throw new Error('Decorating class property failed. Please ensure that transform-class-properties is enabled.');
 }
 
-function filterParam(data) {
+function filterParam() {
+  var data = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+
   if (data.toString() !== '[object Object]') {
     return { data: data };
   }
