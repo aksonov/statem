@@ -1,8 +1,11 @@
 {
   "name": "statem",
-  "version": "0.6.0",
+  "version": "0.6.1",
   "description": "Harel Statecharts state machine with code generation from SCXML statecharts",
   "main": "dist/index.js",
+  "bin": {
+    "watch": "./node_modules/watchman/watchman"
+  },
   "scripts": {
     "test": "npm run gen;mocha ./test/*.js --require babel-core/register  --require babel-polyfill --require mocha-steps --timeout 1000;rm test/genstate.js",
     "watch": "./node_modules/watchman/watchman test/test.scxml 'npm run gen'",
@@ -26,7 +29,8 @@
     "mobx": "^3.0.0",
     "mustache": "^2.2.1",
     "scion-core": "github:hippware/scion-core#1.5.4-own",
-    "scxml": "^2.0.13"
+    "scxml": "^2.0.13",
+    "watchman": "^0.1.8"
   },
   "devDependencies": {
     "babel-core": "^6.3.21",
@@ -43,7 +47,6 @@
     "eslint-plugin-react": "^5.0.1",
     "expect": "^1.13.0",
     "mocha": "^2.3.4",
-    "mocha-steps": "^0.0.1",
-    "watchman": "^0.1.8"
+    "mocha-steps": "^0.0.1"
   }
 }
